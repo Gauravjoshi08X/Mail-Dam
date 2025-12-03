@@ -15,7 +15,7 @@ logging.basicConfig(
 
 # don't know how it does but used by gmailAPI
 def gmail_authenticate():
-    flow = InstalledAppFlow.from_client_secrets_file("gCred.json", SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file("src/creds/gCred.json", SCOPES)
     creds = flow.run_local_server(port=0)
     return build("gmail", "v1", credentials=creds)
 
@@ -61,4 +61,4 @@ def send_message(service, sender, to, subject, messageText):
 
 if __name__ == "__main__":
 	service = gmail_authenticate()
-	send_message(service, "gauravjoshi3140@gmail.com", "joshigaurav9011@gmail.com", "Hello from Maildam", "This is a test email.")
+	send_message(service, "gauravjoshi3140@gmail.com", "joshigaurav9011@gmail.com", "Hello from MailBud", "This is a test email.")
