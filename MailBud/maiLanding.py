@@ -1,7 +1,7 @@
 import imaplib, dotenv, os
 
-def mailLanding()-> str:
-	dotenv.load_dotenv("src/creds/credential.env")
+def mailLand()-> str:
+	dotenv.load_dotenv("src/certs/credential.env")
 
 	user: str = os.getenv("GOOGLE_ACCOUNT_USER_NAME")
 	password: str = os.getenv("GOOGLE_ACCOUNT_APP_PASSWORD")
@@ -25,4 +25,4 @@ def mailLanding()-> str:
 			return f"Email with subject '{targetSpam}' not found in the folder."
 
 if __name__=="__main__":
-	print(mailLanding())
+	print(mailLand())

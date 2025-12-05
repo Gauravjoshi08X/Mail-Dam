@@ -15,7 +15,7 @@ logging.basicConfig(
 
 # don't know how it does but used by gmailAPI
 def gmail_authenticate():
-    flow = InstalledAppFlow.from_client_secrets_file("src/creds/gCred.json", SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file("src/certs/gCred.json", SCOPES)
     creds = flow.run_local_server(port=0)
     return build("gmail", "v1", credentials=creds)
 
@@ -31,7 +31,7 @@ def send_message(service, sender, to, subject, messageText):
 		<html>
 			<body>
 			<p>{Message}</p>
-			<img src="https://9xkmd6fc-5000.inc1.devtunnels.ms/image/{To}" width="1" height="1"/>
+			<img src="https://9xkmd6fc-5000.inc1.devtunnels.ms/static/{To}" width="1" height="1"/>
 			{Link}
 			</body>
 		</html>

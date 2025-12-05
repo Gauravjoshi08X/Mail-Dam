@@ -1,3 +1,5 @@
 loginLog.log
 .vscode
 src
+__pycache__
+rough.py
