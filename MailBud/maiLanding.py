@@ -7,22 +7,24 @@ def mailLand()-> str:
 	password: str = os.getenv("GOOGLE_ACCOUNT_APP_PASSWORD")
 
 	host = 'imap.gmail.com'
-	targetSpam = ""
+	targetSpam: str = input("Enter spam email subject: ")
 
 	# Connect securely with SSL
 	with imaplib.IMAP4_SSL(host) as mail:
+		try:
+			# Login and select Spam folder
+			mail.login(user, password)
+			# select gmail folders like Inbox, Spam
+			mail.select('[Gmail]/Spam')
 
-		# Login and select Spam folder
-		mail.login(user, password)
-		# select gmail folders like Inbox, Spam
-		mail.select('[Gmail]/Spam')
-
-		status, email = mail.search(None, f'(SUBJECT "{targetSpam}")')
-		# email_id returns 1 if found else ''
-		if email:
-			return f"Email with subject '{targetSpam}' found in the folder."
-		else:
-			return f"Email with subject '{targetSpam}' not found in the folder."
+			status, email = mail.search(None, f'(SUBJECT "{targetSpam}")')
+			# email_id returns 1 if found else ''
+			if email:
+				return f"Email with subject '{targetSpam}' found in the folder."
+			else:
+				return f"Email with subject '{targetSpam}' not found in the folder."
+		except Exception as e:
+			return f"Exception: {e}"
 
 if __name__=="__main__":
 	print(mailLand())

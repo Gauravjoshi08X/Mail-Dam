@@ -11,12 +11,12 @@ gantt
     section Core Email Features
     Email Transmission           :done, email, 2025-11-30, 1d
     Inbox Placement Tester :done, inbox, 2025-12-03, 1d
-    Device & Location Info :active,device, 2025-12-04, 2025-12-07
+    Device & Location Info :done,device, 2025-12-04, 2025-12-07
     
     section Intelligence & Optimization
-    Tracking             :active, track, 2025-11-30, 2025-12-07
-    Send-Time Predictor  :predict, after device, 2025-12-13
-    AI Email Writer      :ai, after predict, 2025-12-16
+    Tracking             :done, track, 2025-11-30, 2025-12-07
+    AI Email Writer      :active,ai, after track, 2025-12-10
+    Send-Time Predictor  :predict,after ai , 2025-12-15
 
 ```
 ```mermaid

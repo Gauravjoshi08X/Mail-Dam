@@ -4,10 +4,11 @@ import time, os
 
 # Custom modules
 from mailUA_IP import getUserAgent_IP
+from locateIP import trackIP
 import maiLanding
 
 # Global Variables
-mailFolder: str=maiLanding.mailLand()
+# mailFolder: str=maiLanding.mailLand()
 
 app = Flask(__name__) 
 
@@ -17,12 +18,13 @@ def sendTracker(emailID) -> Response:
     openedTime=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
     with open("src/logs/loginLog.log", "a") as logs:
         logs.write(f"{emailID}|{openedTime}\n")
-    getUserAgent_IP()
+    # trackIP()
     parentDir=os.path.dirname(__file__).removesuffix(r"\MailBud")
     tracker="src/static/trackingPixel.png"
     response=fk.send_file(os.path.join(parentDir, tracker), mimetype="image/png")
-    # this restricts browser to cache tracker but may not work with gmail
+    response.headers["Accept-CH"] = "Sec-CH-UA, Sec-CH-UA-Platform"
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    # this restricts browser to cache tracker but may not work with gmail
     return response
 
 # with link
@@ -33,7 +35,8 @@ def trackClick(emailID) -> Response:
     destination = request.args.get("url") # gets args redirect?url="example.com"
     with open("src/logs/loginLog.log", "a") as logs:
         logs.write(f"{emailID}|{openedTime}|{destination}\n")
-    # getUserAgent_IP()
+    getUserAgent_IP()
+    trackIP()
     # Redirect user to their intended destination
     if (not destination.startswith(("http://www.", "https://www."))):
         return redirect(f"https://www.{destination}")

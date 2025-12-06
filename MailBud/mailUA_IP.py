@@ -7,8 +7,8 @@ def getUserAgent_IP() -> None:
             list(map(lambda x: traces.update({x: request.headers.__getitem__(x)}),
                     ["Sec-Ch-Ua-Platform", "Sec-Ch-Ua", "X-Real-Ip"]))
             json.dump(traces, fp, indent=2)
-        except KeyError:
-            return "Exception: Request from local machine "
+        except KeyError as e:
+            return e
 
 if __name__=="__main__":
     getUserAgent_IP()
