@@ -7,39 +7,63 @@ from mailUA_IP import getUserAgent_IP
 from locateIP import trackIP
 import maiLanding
 
-# Global Variables
-# mailFolder: str=maiLanding.mailLand()
+class TrackingServer:
+    # Global Variables
+    # mailFolder: str=maiLanding.mailLand()
+    def __init__(self, tracker: str="src/static/trackingPixel.png", log:str="src/logs/loginLog.log"):
+        self.app = Flask(__name__) 
+        self.tracker=tracker
+        self.logs=log
+        # Bind routes to instance methods
+        self.app.add_url_rule('/static/<emailID>', view_func=self.sendTracker)
+        self.app.add_url_rule('/click/<emailID>/redirect', view_func=self.trackClick)
 
-app = Flask(__name__) 
+    def _getTrackerURL(self)-> str:
+        parentDir=os.path.dirname(__file__).removesuffix(r"\MailBud")
+        fullURL=os.path.join(parentDir, self.tracker)
+        return fullURL
 
-# With no link
-@app.route('/static/<emailID>')
-def sendTracker(emailID) -> Response:
-    openedTime=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
-    with open("src/logs/loginLog.log", "a") as logs:
-        logs.write(f"{emailID}|{openedTime}\n")
-    # trackIP()
-    parentDir=os.path.dirname(__file__).removesuffix(r"\MailBud")
-    tracker="src/static/trackingPixel.png"
-    response=fk.send_file(os.path.join(parentDir, tracker), mimetype="image/png")
-    response.headers["Accept-CH"] = "Sec-CH-UA, Sec-CH-UA-Platform"
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    # this restricts browser to cache tracker but may not work with gmail
-    return response
+    def _logEvents(self, emailID: str, destination: str=None)->None:
+        openedTime=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
+        logInfo=f"{emailID}|{openedTime}\n"
+        if destination:
+            logInfo=f"{emailID}|{openedTime}|{destination}\n"
+        with open(self.logs, "a") as fp:
+            fp.write(logInfo)
 
-# with link
-@app.route('/click/<emailID>/redirect')
-def trackClick(emailID) -> Response:
-    # Extract the destination URL from query parameters
-    openedTime=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
-    destination = request.args.get("url") # gets args redirect?url="example.com"
-    with open("src/logs/loginLog.log", "a") as logs:
-        logs.write(f"{emailID}|{openedTime}|{destination}\n")
-    getUserAgent_IP()
-    trackIP()
-    # Redirect user to their intended destination
-    if (not destination.startswith(("http://www.", "https://www."))):
-        return redirect(f"https://www.{destination}")
+    # With no link
+    '''
+    This doc is written for me to not wander to find main function.
+    sendTracker
+    '''
+    def sendTracker(self, emailID) -> Response:
+        self._logEvents(emailID)
+        response=fk.send_file(self._getTrackerURL(), mimetype="image/png")
+        # kinda forcing agent to return these
+        response.headers["Accept-CH"] = "Sec-CH-UA, Sec-CH-UA-Platform"
+        # this restricts browser to cache tracker but may not work with gmail
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+
+        return response
+
+    # With Link
+    def _trackClickHelper(self, emailID:str, destination: str)-> None:
+        self._logEvents(emailID, destination)
+        getUserAgent_IP()
+        trackIP()
+    
+    '''
+    This doc is written for me to not wander to find main function.
+    sendTracker
+    '''
+    def trackClick(self, emailID: str) -> Response:
+        # Extract the destination URL from query parameters
+        destination = request.args.get("url") # gets args redirect?url="example.com"
+        self._trackClickHelper(emailID, destination)
+        # Redirect user to their intended destination
+        if (not destination.startswith(("http://www.", "https://www."))):
+            return redirect(f"https://www.{destination}")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    server=TrackingServer()
+    server.app.run(debug=True)

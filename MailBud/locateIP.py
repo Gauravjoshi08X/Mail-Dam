@@ -1,8 +1,7 @@
 import requests
 import json
 
-def trackIP() -> None:
-    path="src/logs/traces.json"
+def trackIP(path: str="src/logs/traces.json") -> None:
     try:
         with open(path, "r") as fp:
             AllData: dict = json.load(fp)
