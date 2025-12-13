@@ -19,17 +19,17 @@ class TrackingServer:
         self.app.add_url_rule('/click/<emailID>/redirect', view_func=self.trackClick)
 
     def _getTrackerURL(self)-> str:
-        parentDir=os.path.dirname(__file__).removesuffix(r"\MailBud")
-        fullURL=os.path.join(parentDir, self.tracker)
-        return fullURL
+        parent_dir=os.path.dirname(__file__).removesuffix(r"\MailBud")
+        full_URL=os.path.join(parent_dir, self.tracker)
+        return full_URL
 
     def _logEvents(self, emailID: str, destination: str=None)->None:
-        openedTime=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
-        logInfo=f"{emailID}|{openedTime}\n"
+        opened_time=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
+        log_info=f"{emailID}|{opened_time}\n"
         if destination:
-            logInfo=f"{emailID}|{openedTime}|{destination}\n"
+            log_info=f"{emailID}|{opened_time}|{destination}\n"
         with open(self.logs, "a") as fp:
-            fp.write(logInfo)
+            fp.write(log_info)
 
     # With no link
     '''

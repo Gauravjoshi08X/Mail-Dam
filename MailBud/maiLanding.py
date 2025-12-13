@@ -6,7 +6,7 @@ class MailLand():
 		self.user: str = os.getenv("GOOGLE_ACCOUNT_USER_NAME")
 		self.password: str = os.getenv("GOOGLE_ACCOUNT_APP_PASSWORD")
 		self.host = 'imap.gmail.com'
-		self.targetSpam: str = target
+		self.target_spam: str = target
 
 	def mailLand(self)-> str:
 
@@ -18,12 +18,12 @@ class MailLand():
 				# select gmail folders like Inbox, Spam
 				mail.select('[Gmail]/Spam')
 
-				status, email = mail.search(None, f'(SUBJECT "{self.targetSpam}")')
+				status, email = mail.search(None, f'(SUBJECT "{self.target_spam}")')
 				# email_id returns binary index of email if found else ''
 				if (email!=[b'']):
-					return f"Email with subject '{self.targetSpam}' found in the folder."
+					return f"Email with subject '{self.target_spam}' found in the folder."
 				else:
-					return f"Email with subject '{self.targetSpam}' not found in the folder."
+					return f"Email with subject '{self.target_spam}' not found in the folder."
 			except Exception as e:
 				return f"Exception: {e}"
 
