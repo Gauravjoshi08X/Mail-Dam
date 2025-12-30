@@ -1,4 +1,5 @@
 from flask import Flask, request, redirect, Response
+from encryption import Encryptor
 import flask as fk
 import time, os
 
@@ -12,6 +13,7 @@ class TrackingServer:
     # mailFolder: str=maiLanding.mailLand()
     def __init__(self, tracker: str="src/static/trackingPixel.png", log:str="src/logs/loginLog.log"):
         self.app = Flask(__name__) 
+        self.encryptor: Encryptor=Encryptor()
         self.tracker=tracker
         self.logs=log
         # Bind routes to instance methods
@@ -23,11 +25,15 @@ class TrackingServer:
         full_URL=os.path.join(parent_dir, self.tracker)
         return full_URL
 
-    def _logEvents(self, emailID: str, destination: str=None)->None:
+    def _logEvents(self, emailID: str, destination: str="")->None:
         opened_time=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
-        log_info=f"{emailID}|{opened_time}\n"
+
+        email_encrypted=self.encryptor.encryptCrutial(emailID)
+        destination_encrypted=self.encryptor.encryptCrutial(destination)
+
+        log_info=f"{email_encrypted}|{opened_time}\n"
         if destination:
-            log_info=f"{emailID}|{opened_time}|{destination}\n"
+            log_info=f"{email_encrypted}|{opened_time}|{destination_encrypted}\n"
         with open(self.logs, "a") as fp:
             fp.write(log_info)
 
@@ -36,6 +42,8 @@ class TrackingServer:
     This doc is written for me to not wander to find main function.
     sendTracker
     '''
+
+    # TODO:  Fix duplicate entry
     def sendTracker(self, emailID) -> Response:
         self._logEvents(emailID)
         response=fk.send_file(self._getTrackerURL(), mimetype="image/png")
@@ -45,13 +53,13 @@ class TrackingServer:
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
 
         return response
-
+    
     # With Link
     def _trackClickHelper(self, emailID:str, destination: str)-> None:
         self._logEvents(emailID, destination)
         getUserAgent_IP()
         trackIP()
-    
+
     '''
     This doc is written for me to not wander to find main function.
     sendTracker

@@ -23,6 +23,7 @@ class MailTransmit():
 
 	# function to build html template for different version of link
 	def _buildHTML(self, link: str|None, message_text: str, to: str) -> str:
+		linkHTML=""
 		if link:
 			linkHTML=f"""<a href="{self.serverLink}/click/{to}/redirect?url={link}">{link}</a>"""
 		# Embed tracking pixel
@@ -58,6 +59,6 @@ if __name__ == "__main__":
 		format='%(levelname)s - %(message)s'
 	)
 
-	mail=MailTransmit("https://9xkmd6fc-5000.inc1.devtunnels.ms", "src/certs/g_cred.json")
-	mail.sendMessage("gauravjoshi3140@gmail.com", "joshigaurav9011@gmail.com", "Hello from MailBud", "This is a test email.", "google.com")
+	mail=MailTransmit("https://9xkmd6fc-5000.inc1.devtunnels.ms", "src/certs/gCred.json")
+	mail.sendMessage("gauravjoshi3140@gmail.com", "joshigaurav9011@gmail.com", "Hello from MailBud", "This is a test email.")
 
