@@ -50,15 +50,3 @@ class MailTransmit():
 		body = {"raw": raw_message}
 		self.send_now = self.service.users().messages().send(userId="me", body=body).execute()
 		return logging.debug(f"Message sent. ID: {self.send_now['id']}")
-
-if __name__ == "__main__":
-	
-# logs to display console errors
-	logging.basicConfig(
-		level=logging.ERROR,
-		format='%(levelname)s - %(message)s'
-	)
-
-	mail=MailTransmit("https://9xkmd6fc-5000.inc1.devtunnels.ms", "src/certs/gCred.json")
-	mail.sendMessage("gauravjoshi3140@gmail.com", "joshigaurav9011@gmail.com", "Hello from MailBud", "This is a test email.")
-
