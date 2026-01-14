@@ -4,7 +4,7 @@ import flask as fk
 import time, os
 
 # Custom modules
-from mailUA_IP import getUserAgent_IP
+from mailUA_IP import mailUA_IP
 from locateIP import trackIP
 import maiLanding
 
@@ -57,7 +57,7 @@ class TrackingServer:
     # With Link
     def _trackClickHelper(self, emailID:str, destination: str)-> None:
         self._logEvents(emailID, destination)
-        getUserAgent_IP()
+        mailUA_IP()
         trackIP()
 
     '''
