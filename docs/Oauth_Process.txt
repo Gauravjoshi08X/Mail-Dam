@@ -1,0 +1,8 @@
+Flutter sends request to Flask `/auth/google`
+Flask generates the Google authorization URL
+Flask sends this URL back to Flutter (as JSON response)
+Flutter opens this URL in the user's phone browser/webview
+User logs in on their device
+Google redirects back to your Flask callback endpoint with the code
+Flask exchanges code for tokens on the server
+Flask sends tokens/user info back to Flutter
