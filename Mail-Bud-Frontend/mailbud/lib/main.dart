@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
+import 'connect_backend.dart' as connect_backend;
 void main() {
   runApp(const MyApp());
 }
@@ -34,6 +34,7 @@ class LoginPage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
+            connect_backend.sendStat();
             Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(title: "Mail bud")));
           },
           // style: ElevatedButton.styleFrom(minimumSize: Size(80, 60)),
