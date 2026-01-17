@@ -4,14 +4,12 @@ erDiagram
         int user_id PK
         string email
         string name
-        datetime created_at
     }
 
     PROJECT {
         int project_id PK
         int user_id FK
         string project_name
-        datetime created_at
     }
 
     EMAIL {

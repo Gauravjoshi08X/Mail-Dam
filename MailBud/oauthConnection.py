@@ -1,55 +1,68 @@
-from google_auth_oauthlib.flow import InstalledAppFlow, Flow
-from googleapiclient.discovery import build
-from typing import Any
-from flask import Flask, Response, request
-class Oauth():
-    # Installed App Flow requires a sequence of strings to request during the flow
-    SCOPES = ['openid', 'email', 'profile', "https://www.googleapis.com/auth/gmail.send"]
+from flask import Flask, redirect, request
+from google_auth_oauthlib.flow import Flow
+import requests
+import os
+import os
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-    def __init__(self, g_cred, redirectURI):
-        self.g_cred=g_cred
-        self.session={}
-        self.redirectURI=redirectURI
-    
-    app=Flask(__name__)
+app = Flask(__name__)
 
-    @app.route("/auth/google", methods=["POST"])
-    def generate_auth_url(self) -> Any:
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SCOPES = [
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/gmail.send"
+]
+
+CLIENT_SECRETS = r"C:\Users\Gaurav\VSCode\Mail-Dam\src\certs\g_cred.json"
+REDIRECT_URI = "https://9xkmd6fc-5000.inc1.devtunnels.ms/oauth/callback"
+
+@app.route("/auth/google")
+def auth_google():
+    flow = Flow.from_client_secrets_file(
+        CLIENT_SECRETS,
+        scopes=SCOPES,
+        redirect_uri=REDIRECT_URI
+    )
+
+    auth_url, _ = flow.authorization_url(
+        access_type="offline",
+        prompt="consent"
+    )
+
+    return redirect(auth_url)
+
+@app.route("/oauth/callback")
+def oauth_callback():
+    try:
         flow = Flow.from_client_secrets_file(
-            self.g_cred,
-            scopes=self.SCOPES,
-            redirect_uri=self.redirectURI
+            CLIENT_SECRETS,
+            scopes=SCOPES,
+            redirect_uri=REDIRECT_URI
         )
-        
-        auth_url, state = flow.authorization_url(
-            access_type='offline',  # Gets refresh token
-            include_granted_scopes='true'
-        )
-        
-        # Store 'state' in session for security verification later
-        self.session['state'] = state
-        self.response={}
-        self.response['auth_url']=auth_url
-        return self.response
-    
 
-    @app.route("/auth/callback")
-    def oauth_callback(self):
-        state = self.session['state']
-        
-        flow = Flow.from_client_secrets_file(
-            self.g_cred,
-            scopes=self.SCOPES,
-            state=state,
-            redirect_uri=self.redirectURI
-        )
-        
+        # Make sure request.url has ?code=...
         flow.fetch_token(authorization_response=request.url)
-        
-        # Now use credentials to build Gmail service or get user info
-        self.credentials = flow.credentials
-        print(self.credentials)
+        creds = flow.credentials
+
+        # Get user info
+        userinfo = requests.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {creds.token}"}
+        ).json()
+
+        # Now write to file only if everything succeeded
+        path = os.path.join(BASE_DIR, "data.txt")
+        with open(path, "w") as f:
+            f.write(f"{userinfo['email']} {userinfo['name']} {creds.refresh_token}")
+
+        print("File written successfully")
+        return "OAuth completed, file saved!"
+
+    except Exception as e:
+        print("Error in OAuth callback:", e)
+        return f"OAuth failed: {e}", 500
 
 if __name__=="__main__":
-    mail=Oauth(r"C:\Users\Gaurav\VSCode\Mail-Dam\src\certs\g_cred.json", "http://localhost:5000/oauth/callback")
-    mail.app.run(debug=True)
+    app.run(debug=True)

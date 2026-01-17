@@ -34,10 +34,9 @@ class LoginPage extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            connect_backend.sendStat();
+            connect_backend.openAuth();
             Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(title: "Mail bud")));
           },
-          // style: ElevatedButton.styleFrom(minimumSize: Size(80, 60)),
           child: Padding(
           padding: EdgeInsetsGeometry.only(top: 10, bottom: 10),
           child: Row(mainAxisSize: MainAxisSize.min,
