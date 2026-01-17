@@ -42,17 +42,14 @@ def oauth_callback():
             redirect_uri=REDIRECT_URI
         )
 
-        # Make sure request.url has ?code=...
         flow.fetch_token(authorization_response=request.url)
         creds = flow.credentials
 
-        # Get user info
         userinfo = requests.get(
             "https://www.googleapis.com/oauth2/v2/userinfo",
             headers={"Authorization": f"Bearer {creds.token}"}
         ).json()
 
-        # Now write to file only if everything succeeded
         path = os.path.join(BASE_DIR, "data.txt")
         with open(path, "w") as f:
             f.write(f"{userinfo['email']} {userinfo['name']} {creds.refresh_token}")
