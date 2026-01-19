@@ -1,8 +1,8 @@
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'dart:developer' as dev;
 class GlobalFunction {
 static var imgPath='';
 static var csvPath='';
-static var docPath='';
 
 static Future<String?> pickFile(OpenFileDialogType dialogType) async {
   final params = OpenFileDialogParams(
@@ -15,18 +15,13 @@ static Future<String?> pickFile(OpenFileDialogType dialogType) async {
 
   void selectImage() async {
     final imagePath = await GlobalFunction.pickFile(OpenFileDialogType.image);
-    docPath = imagePath.toString();
-    print(docPath);
+    imgPath = imagePath.toString();
+    dev.log(imgPath);
 }
 
-  void selectDoc() async {
-    final imagePath = await GlobalFunction.pickFile(OpenFileDialogType.document);
-    imgPath = imagePath.toString();
-    print(imgPath);
-}
   void selectCSV() async {
     final imagePath = await GlobalFunction.pickFile(OpenFileDialogType.document);
     csvPath = imagePath.toString();
-    print(csvPath);
+    dev.log(csvPath);
 }
 }

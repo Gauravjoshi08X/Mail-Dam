@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'connect_backend.dart' as connect_backend;
@@ -138,6 +139,7 @@ final TextEditingController projectControl=TextEditingController();
 final TextEditingController senderControl=TextEditingController();
 final TextEditingController subjectControl=TextEditingController();
 final TextEditingController linkControl=TextEditingController();
+final TextEditingController messageControl=TextEditingController();
 
 
   @override
@@ -184,26 +186,29 @@ final TextEditingController linkControl=TextEditingController();
       padding: EdgeInsets.all(12),
       child: Column(
         spacing: 15,
-        children: [reuseable.ReusableComponents().fields("Enter Project name", projectControl),
-      reuseable.ReusableComponents().fields("Enter Company's email", senderControl),
-      reuseable.ReusableComponents().fields("Enter Subject", subjectControl),
-      Row(children: [
-      reuseable.ReusableComponents().attachments("Insert Document", document, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectDoc(), context),
-      reuseable.ReusableComponents().attachments("Insert Image", png, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectImage(), context),
-      ]),
-      reuseable.ReusableComponents().fields("Enter a link (Optional)", linkControl),
-      
-      Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 20),child: reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(senderEmail: "user@example.com", subject: "Help"))),
-      Column(
-        spacing: 30,
         children: [
-          reuseable.ReusableComponents().attachments("Insert CSV", csv, 20, 150, 20,0.9, ()=>global_fn.GlobalFunction().selectCSV(), context),
-          reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255), () => connect_backend.sendData(project: "contact", senderEmail: "user@example.com", subject: "Help")),
 
-        ],
-      )
-    ]))
-    ),
+      reuseable.ReusableComponents().fields("Enter Project name", projectControl, 1),
+      reuseable.ReusableComponents().fields("Enter Company's email", senderControl, 1),
+      reuseable.ReusableComponents().fields("Enter Subject", subjectControl, 1),
+
+      Row(
+      children: [reuseable.ReusableComponents().attachments("Insert Image", png, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectImage(), context),
+      reuseable.ReusableComponents().attachments("Insert CSV", csv, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectCSV(), context),
+      ]),
+
+      reuseable.ReusableComponents().fields("Enter Message", messageControl, 5),
+      reuseable.ReusableComponents().fields("Enter a link (Optional)", linkControl, 1),
+
+      Padding(padding: EdgeInsetsGeometry.only(left: 17),
+        child: Row(
+          spacing: MediaQuery.of(context).size.width*.2,
+          children: [
+          reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(senderEmail: senderControl.text, message: messageControl.text, subject: subjectControl.text, link: linkControl.text)),
+          reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255), () => connect_backend.sendData(project: projectControl.text, senderEmail: senderControl.text, subject: subjectControl.text, link: linkControl.text, message: messageControl.text)),
+        ])), 
+      ])
+    )),
         // Explore
         SingleChildScrollView(
         child: Column(

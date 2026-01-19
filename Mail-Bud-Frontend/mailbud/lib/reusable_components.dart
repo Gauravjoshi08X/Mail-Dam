@@ -13,12 +13,14 @@ class ReusableComponents {
       );
   }
 
-  Widget fields(String hint, TextEditingController controller){
+  Widget fields(String hint, TextEditingController controller, int maxsize){
     return TextField(decoration: InputDecoration(hintText: hint, 
               border: OutlineInputBorder(),
               filled: true,
               fillColor: Color.fromRGBO(25, 25, 25, 0.698)),
               controller: controller,
+              maxLines: maxsize,
+              keyboardType: TextInputType.multiline,
               );
   }
 
