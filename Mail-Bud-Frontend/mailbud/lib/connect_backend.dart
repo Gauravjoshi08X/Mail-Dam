@@ -1,6 +1,6 @@
-import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 Future<void> openAuth() async {
   final uri = Uri.parse(
@@ -13,13 +13,14 @@ Future<void> openAuth() async {
   );
 }
 
-Future<void> sendData() async {
-  final url=Uri.parse("https://9xkmd6fc-5000.inc1.devtunnels.ms/auth");
-  Map<String, dynamic> payload={"name": "gaurav"};
-  Map<String, String> header={"Content-Type": "application/json"};
-  http.post(url, headers: header, body:  payload);
-}
-
-void main() {
-  sendData();
+Future sendData(String project, String senderEmail, String subject) async {
+  try {
+    var url = Uri.parse('https://9xkmd6fc-5000.inc1.devtunnels.ms/getdata');
+    await http.post(url, 
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({"project": project, 'sender': senderEmail, "subject": subject}));
+  } catch (e) {
+    print('Error sending data: $e');
+    rethrow;
+  }
 }

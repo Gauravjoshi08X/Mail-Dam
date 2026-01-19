@@ -41,7 +41,7 @@ class LoginPage extends StatelessWidget {
           padding: EdgeInsetsGeometry.only(top: 10, bottom: 10),
           child: Row(mainAxisSize: MainAxisSize.min,
            spacing: 20,
-          children: [SvgPicture.string(google),Text("Continue with Google", style: TextStyle(fontSize: 22),)
+           children: [SvgPicture.string(google),Text("Continue with Google", style: TextStyle(fontSize: 22),)
           ]))
         ),
       ),
@@ -132,6 +132,12 @@ class _MyHomePageState extends State<MyHomePage> {
 </svg>
 """;
   
+
+final TextEditingController projectControl=TextEditingController();
+final TextEditingController senderControl=TextEditingController();
+final TextEditingController subjectControl=TextEditingController();
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,9 +182,9 @@ class _MyHomePageState extends State<MyHomePage> {
       padding: EdgeInsets.all(12),
       child: Column(
         spacing: 15,
-        children: [fields("Enter Project name"),
-      fields("Enter Company's email"),
-      fields("Enter Subject"),
+        children: [fields("Enter Project name", projectControl),
+      fields("Enter Company's email", senderControl),
+      fields("Enter Subject", subjectControl),
       Row(children: [
       attachments("Insert CSV", csv, 20, 150, 20),
       attachments("Insert Document", document, 20, 150, 20),
@@ -213,11 +219,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-
-
   // Reusable Components
-  Widget exploreButtons(double btnWidth, String lbl, Color textColor){ 
-      return ElevatedButton(onPressed: (){},
+  Widget exploreButtons(double btnWidth, String lbl, Color textColor){
+      return ElevatedButton(onPressed: () => connect_backend.sendData(projectControl.text, senderControl.text, subjectControl.text),
        style: ElevatedButton.styleFrom(backgroundColor: Color.fromRGBO(25, 25, 25, 0.698),
        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
        minimumSize: Size(btnWidth, 50)),
@@ -225,11 +229,13 @@ class _MyHomePageState extends State<MyHomePage> {
       );
   }
 
-  Widget fields(String hint){
+  Widget fields(String hint, TextEditingController controller){
     return TextField(decoration: InputDecoration(hintText: hint, 
               border: OutlineInputBorder(),
               filled: true,
-              fillColor: Color.fromRGBO(25, 25, 25, 0.698)));
+              fillColor: Color.fromRGBO(25, 25, 25, 0.698)),
+              controller: controller,
+              );
   }
 
   Widget attachments(String text, String ico, double cardPadding, double cardHeight, double cardSpacing){ 
@@ -243,7 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             spacing: cardSpacing,
             children: [
-          SvgPicture.string(ico,color: Color.fromRGBO(224, 225, 231, 1)),
+          SvgPicture.string(ico, color: Color.fromRGBO(224, 225, 231, 1)),
           Text(text, style: TextStyle(fontFamily: "Roboto", fontSize: 20, fontWeight: FontWeight.w300, color: Color.fromRGBO(224, 225, 231, 1)),)
         ]),
       )

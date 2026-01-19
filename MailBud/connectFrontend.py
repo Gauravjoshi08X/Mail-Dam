@@ -1,8 +1,8 @@
-from flask import Flask, request
+from flask import Flask, request, json
 app=Flask(__name__)
-@app.route("/getdata", methods=["POST"])
+@app.route("/getdata", methods=["POST", "GET"])
 def getData():
-    data = request.get_json()
+    data = json.dumps(request.get_json())
     print(data)
     return "Received"
 
