@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'connect_backend.dart' as connect_backend;
+import 'reusable_components.dart' as reuseable;
+import 'global_function.dart' as global_fn;
 void main() {
   runApp(const MyApp());
 }
@@ -55,12 +57,11 @@ class LoginPage extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>{
     int currentTabIndex = 0;
     final String email="""<svg width="58" height="50" viewBox="0 0 58 50" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0_15_84)">
@@ -136,6 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
 final TextEditingController projectControl=TextEditingController();
 final TextEditingController senderControl=TextEditingController();
 final TextEditingController subjectControl=TextEditingController();
+final TextEditingController linkControl=TextEditingController();
 
 
   @override
@@ -157,7 +159,7 @@ final TextEditingController subjectControl=TextEditingController();
         child: ListView(
           padding: EdgeInsets.only(top: 60),
           children: <Widget>[
-            exploreButtons(0, "Create project", Color.fromRGBO(224, 225, 231, 1)),
+            reuseable.ReusableComponents().exploreButtons(0, "Create project", Color.fromRGBO(224, 225, 231, 1), connect_backend.sendData),
             Padding(padding: EdgeInsetsGeometry.only(top: 20, left: 20, bottom: 0) ,child: Text("Recent", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400))),
             ListTile(
               title: const Text('Promotion of new course', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),),
@@ -182,117 +184,39 @@ final TextEditingController subjectControl=TextEditingController();
       padding: EdgeInsets.all(12),
       child: Column(
         spacing: 15,
-        children: [fields("Enter Project name", projectControl),
-      fields("Enter Company's email", senderControl),
-      fields("Enter Subject", subjectControl),
+        children: [reuseable.ReusableComponents().fields("Enter Project name", projectControl),
+      reuseable.ReusableComponents().fields("Enter Company's email", senderControl),
+      reuseable.ReusableComponents().fields("Enter Subject", subjectControl),
       Row(children: [
-      attachments("Insert CSV", csv, 20, 150, 20),
-      attachments("Insert Document", document, 20, 150, 20),
+      reuseable.ReusableComponents().attachments("Insert Document", document, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectDoc(), context),
+      reuseable.ReusableComponents().attachments("Insert Image", png, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectImage(), context),
       ]),
-      Row(
+      reuseable.ReusableComponents().fields("Enter a link (Optional)", linkControl),
+      
+      Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 20),child: reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(senderEmail: "user@example.com", subject: "Help"))),
+      Column(
+        spacing: 30,
         children: [
-          attachments("Insert Image", png, 10, 100, 10),
-          attachments("Insert Link", insertLink, 10, 100, 10),
+          reuseable.ReusableComponents().attachments("Insert CSV", csv, 20, 150, 20,0.9, ()=>global_fn.GlobalFunction().selectCSV(), context),
+          reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255), () => connect_backend.sendData(project: "contact", senderEmail: "user@example.com", subject: "Help")),
+
         ],
-      ),
-      Padding(padding: EdgeInsetsGeometry.only(top: 30, left: 17), child:
-      Row(
-        spacing: MediaQuery.of(context).size.width*.2,
-        children: [
-      exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0)),
-      exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255)),
-      ])),
+      )
     ]))
     ),
         // Explore
         SingleChildScrollView(
         child: Column(
-        children: [card(email,"Email Views", "128/410", Color.fromRGBO(0, 141, 0, 0.763)),
-        card(link,"Link Clicks", "68/410", Color.fromRGBO(185, 0, 0, 0.811)),
-        card(star,"Email Pull", "Moderate", Color.fromRGBO(0,141,0,.763)),
-        card(bounce,"Bounce", "8/410", Color.fromRGBO(0,141,0,.763)),
-        card(location,"Location", "Lalitpur", Color.fromRGBO(224, 225, 231, 1)),
+        children: [reuseable.ReusableComponents().card(email,"Email Views", "128/410", Color.fromRGBO(0, 141, 0, 0.763)),
+        reuseable.ReusableComponents().card(link,"Link Clicks", "68/410", Color.fromRGBO(185, 0, 0, 0.811)),
+        reuseable.ReusableComponents().card(star,"Email Pull", "Moderate", Color.fromRGBO(0,141,0,.763)),
+        reuseable.ReusableComponents().card(bounce,"Bounce", "8/410", Color.fromRGBO(0,141,0,.763)),
+        reuseable.ReusableComponents().card(location,"Location", "Lalitpur", Color.fromRGBO(224, 225, 231, 1)),
         Image.asset("asset/images/chart.png")
       ])
     )
     ][currentTabIndex]
     );
   }
-
-  // Reusable Components
-  Widget exploreButtons(double btnWidth, String lbl, Color textColor){
-      return ElevatedButton(onPressed: () => connect_backend.sendData(projectControl.text, senderControl.text, subjectControl.text),
-       style: ElevatedButton.styleFrom(backgroundColor: Color.fromRGBO(25, 25, 25, 0.698),
-       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-       minimumSize: Size(btnWidth, 50)),
-       child: Text(lbl, style: TextStyle(fontSize: 20, color: textColor)), 
-      );
   }
 
-  Widget fields(String hint, TextEditingController controller){
-    return TextField(decoration: InputDecoration(hintText: hint, 
-              border: OutlineInputBorder(),
-              filled: true,
-              fillColor: Color.fromRGBO(25, 25, 25, 0.698)),
-              controller: controller,
-              );
-  }
-
-  Widget attachments(String text, String ico, double cardPadding, double cardHeight, double cardSpacing){ 
-      return Card(
-        color: Color.fromRGBO(18, 18, 18, 1),
-        elevation: 1,
-        child: Container(
-          padding: EdgeInsets.only(top: cardPadding),
-          width: MediaQuery.of(context).size.width * 0.45,
-          height: cardHeight,
-          child: Column(
-            spacing: cardSpacing,
-            children: [
-          SvgPicture.string(ico, color: Color.fromRGBO(224, 225, 231, 1)),
-          Text(text, style: TextStyle(fontFamily: "Roboto", fontSize: 20, fontWeight: FontWeight.w300, color: Color.fromRGBO(224, 225, 231, 1)),)
-        ]),
-      )
-        );
-  }
-  Widget card(String iconCode, String primaryText, String secondaryText, Color colorCode){
-    return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Card(
-              shadowColor: Color.fromARGB(78, 179, 0, 255),
-              surfaceTintColor: Color.fromARGB(255, 20, 105, 102),
-              color: Color.fromRGBO(18, 18, 18, 1),
-              elevation: 1,
-              child: Container(
-                padding: EdgeInsets.fromLTRB(0, 15, 0, 4),
-                width: 400,
-                height: 110,
-                child: Column(children: [Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 78,
-                  children: [
-                SvgPicture.string(iconCode, color: Color.fromRGBO(224, 225, 231, 1)),
-                Text(
-                  primaryText,
-                  textAlign: TextAlign.right,
-                  style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Color.fromRGBO(224, 225, 231, 1)),
-                ),
-                  ]
-                ),
-
-                Container(
-                  margin: EdgeInsets.only(top: 3),
-                  child: Text(secondaryText, style: TextStyle(color: colorCode, fontSize: 15),textAlign: TextAlign.right)
-                )
-                
-                
-                ]
-                )
-                
-              ),
-            )
-          ],
-        );
-  }
-}
