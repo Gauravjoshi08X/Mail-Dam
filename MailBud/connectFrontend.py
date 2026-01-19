@@ -6,5 +6,12 @@ def getData():
     print(data)
     return "Received"
 
+@app.route("/sendfile", methods=["POST", "GET"])
+def getFile():
+    data = request.files
+    print(data)
+    return "Received"
+
 if __name__=="__main__":
     app.run(debug=True)
+

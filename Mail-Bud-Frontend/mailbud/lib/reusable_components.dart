@@ -24,9 +24,9 @@ class ReusableComponents {
               );
   }
 
-  Widget attachments(String text, String ico, double cardPadding, double cardHeight, double cardSpacing, double width, VoidCallback fn,  BuildContext context){ 
+  Widget attachments(String text, String ico, double cardPadding, double cardHeight, double cardSpacing, double width, VoidCallback fn, BuildContext context, {Color clr=const Color.fromRGBO(18, 18, 18, 1)}){ 
       return Card(
-        color: Color.fromRGBO(18, 18, 18, 1),
+        color: clr,
         elevation: 1,
         child: InkWell(
           onTap: fn,

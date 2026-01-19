@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'dart:developer' as dev;
+
 Future<void> openAuth() async {
   final uri = Uri.parse(
     "https://9xkmd6fc-5000.inc1.devtunnels.ms/auth/google"
@@ -14,7 +15,7 @@ Future<void> openAuth() async {
   );
 }
 
-Future sendData({String? project, String? senderEmail, String? subject, String? message, String? link, File? image, File? csv}) async {
+Future<void> sendData({String? project, String? senderEmail, String? subject, String? message, String? link}) async {
   try {
     var url = Uri.parse('https://9xkmd6fc-5000.inc1.devtunnels.ms/getdata');
     await http.post(url, 
@@ -25,3 +26,14 @@ Future sendData({String? project, String? senderEmail, String? subject, String? 
     rethrow;
   }
 }
+
+Future<void> sendFiles(File img, File csv) async {
+  var request=http.MultipartRequest("POST", Uri.parse("https://9xkmd6fc-5000.inc1.devtunnels.ms/sendfile"));
+  request.files.add(await http.MultipartFile.fromPath('file', img.path));
+  request.files.add(await http.MultipartFile.fromPath('file', csv.path));
+  var response=await request.send();
+  if (response.statusCode==200){
+    dev.log("Success");
+  }
+  }
+

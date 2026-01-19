@@ -141,6 +141,8 @@ final TextEditingController subjectControl=TextEditingController();
 final TextEditingController linkControl=TextEditingController();
 final TextEditingController messageControl=TextEditingController();
 
+String? selectedImg;
+String? selectedCSV;
 
   @override
   Widget build(BuildContext context) {
@@ -193,8 +195,25 @@ final TextEditingController messageControl=TextEditingController();
       reuseable.ReusableComponents().fields("Enter Subject", subjectControl, 1),
 
       Row(
-      children: [reuseable.ReusableComponents().attachments("Insert Image", png, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectImage(), context),
-      reuseable.ReusableComponents().attachments("Insert CSV", csv, 20, 150, 20,0.45, ()=>global_fn.GlobalFunction().selectCSV(), context),
+      children: [
+      reuseable.ReusableComponents().attachments("Insert Image", png, 20, 150, 20,0.45,
+        () async {final path= await global_fn.GlobalFunction().selectImage();
+          setState(() {
+          selectedImg=path;
+          });
+          },
+          clr: selectedImg!=null?Color.fromRGBO(0,141,0,.763):Color.fromRGBO(18, 18, 18, 1),
+          context),
+
+      reuseable.ReusableComponents().attachments("Insert CSV", csv, 20, 150, 20,0.45,
+      () async{
+        final path=await global_fn.GlobalFunction().selectCSV();
+        setState(() {
+          selectedCSV=path;
+        });
+      },
+      clr: selectedCSV!=null?Color.fromRGBO(0,141,0,.763):Color.fromRGBO(18, 18, 18, 1),
+      context),
       ]),
 
       reuseable.ReusableComponents().fields("Enter Message", messageControl, 5),
@@ -205,7 +224,10 @@ final TextEditingController messageControl=TextEditingController();
           spacing: MediaQuery.of(context).size.width*.2,
           children: [
           reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(senderEmail: senderControl.text, message: messageControl.text, subject: subjectControl.text, link: linkControl.text)),
-          reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255), () => connect_backend.sendData(project: projectControl.text, senderEmail: senderControl.text, subject: subjectControl.text, link: linkControl.text, message: messageControl.text)),
+          reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255),
+          () async {await global_fn.GlobalFunction().selectCSV();
+                    await global_fn.GlobalFunction().selectImage();
+          }),
         ])), 
       ])
     )),
