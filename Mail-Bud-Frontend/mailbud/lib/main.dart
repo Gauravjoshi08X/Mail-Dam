@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'connect_backend.dart' as connect_backend;
 import 'reusable_components.dart' as reuseable;
 import 'global_function.dart' as global_fn;
+
 void main() {
   runApp(const MyApp());
 }
@@ -226,6 +227,7 @@ String? selectedCSV;
           reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255),
           () async {await connect_backend.sendData(project: projectControl.text, senderEmail: senderControl.text, subject: subjectControl.text, message: messageControl.text, link: linkControl.text);
                     await connect_backend.sendFiles();
+                    await connect_backend.sendMail();
           }),
         ])), 
       ])

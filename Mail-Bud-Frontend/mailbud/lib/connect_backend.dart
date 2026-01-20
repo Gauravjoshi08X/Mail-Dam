@@ -1,10 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
 import 'dart:developer' as dev;
 import 'global_function.dart' as fn;
+
 Future<void> openAuth() async {
   final uri = Uri.parse(
     "https://9xkmd6fc-5000.inc1.devtunnels.ms/auth/google"
@@ -34,7 +33,6 @@ Future<void> sendFiles() async {
   request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.csvPath));
   request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.imgPath));
   var response=await request.send();
-  print(response);
   if (response.statusCode==200){
     dev.log("Success");
   }}
@@ -43,3 +41,13 @@ Future<void> sendFiles() async {
   }
   }
 
+Future<void> sendMail() async {
+  try{
+  Uri.parse(
+    "https://9xkmd6fc-5000.inc1.devtunnels.ms/sendmail"
+  );
+  }
+  catch (e){
+    dev.log(e.toString());
+  }
+}

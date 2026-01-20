@@ -51,7 +51,7 @@ def oauth_callback():
 
         path = os.path.join(BASE_DIR, "data.txt")
         with open(path, "w") as f:
-            f.write(f"{userinfo['email']} {userinfo['name']} {creds.refresh_token}")
+            f.write(f"{userinfo['email']},{userinfo['name']},{creds.refresh_token}")
 
         print("File written successfully")
         return "OAuth completed, file saved!"

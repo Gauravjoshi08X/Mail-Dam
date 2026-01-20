@@ -2,10 +2,12 @@ from flask import Flask, request, json
 from typing import Any
 import base64
 import mimetypes
+import protoMain as pm
+
 app=Flask(__name__)
 @app.route("/getdata", methods=["POST", "GET"])
-def getData():
-    data = json.dumps(request.get_json())
+def getData() -> dict[str, Any]:
+    data = request.get_json()
     return data
 
 @app.route("/sendfile", methods=["POST", "GET"])
@@ -29,7 +31,14 @@ def getFile() -> dict[str, Any]:
                 'data': encoded_data,
                 'mime_type': mime_type
             }
+            print(attachment)
             return attachment
+
+@app.route("/sendmail", methods=["POST", "GET"])
+def sendMail():
+    print("Mail Sent Successfully!")
+    pm.SEND()
+    return "Mail Sent Successfully!"
 
 if __name__=="__main__":
     app.run(debug=True)
