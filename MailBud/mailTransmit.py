@@ -1,7 +1,9 @@
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from  email import encoders
 import base64, logging
 
 
@@ -38,15 +40,22 @@ class MailTransmit():
 		"""
 		return htmlContent
 
-	def sendMessage(self, sender: str, to: str, subject: str, message_text: str, link: str=None):
+	def sendMessage(self, sender: str, to: str, subject: str, message_text: str, link: str=None, attachment: dict={}):
 		message=MIMEMultipart("alternative")
 		message["to"] = to
 		message["from"] = sender
 		message["subject"] = subject
 
 		message.attach(MIMEText(self._buildHTML(link, message_text, to), "html"))
+		file_data = base64.b64decode(attachment['data'])
+		if (len(attachment.keys())!=0):
+			part = MIMEBase('application', 'octet-stream')
+			part.set_payload(file_data)
+			encoders.encode_base64(part)
+			raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+			part.add_header('Content-Disposition', f"attachment; filename= {attachment['filename']}")
+			message.attach(part)
 
-		raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 		body = {"raw": raw_message}
 		self.send_now = self.service.users().messages().send(userId="me", body=body).execute()
 		return logging.debug(f"Message sent. ID: {self.send_now['id']}")
