@@ -1,23 +1,24 @@
-import csv
+import csv, json
 from mailTransmit import MailTransmit
-import connectFrontend as cf;
+from iterEmails import iterEmail
 def SEND():
-    filename:str = input("Enter the CSV filename: ")
+    # filename:str = input("Enter the CSV filename: ")
     mail=MailTransmit("https://9xkmd6fc-5000.inc1.devtunnels.ms", r"C:\Users\Gaurav\VSCode\Mail-Dam\src\certs\g_cred.json")
     try:
-        textData: dict = cf.getData()
-        imgAttach: dict = cf.getFile()
-        with open(filename, 'r') as file:
-            csv_reader = csv.reader(file)
-            for row in csv_reader:
-                mail.sendMessage(sender=textData.get("sender"), 
-                                to=row[0],
-                                subject=textData.get("subject"),
-                                message_text=textData.get("message"),
-                                image_attachments=imgAttach)
+        mailData = open("sendData.json", "r")
+        sendData: dict=json.load(mailData)
 
+        imgData = open("attach.json", "r")
+        imgAttach: dict=json.load(imgData)
+        for email in iterEmail():
+            mail.sendMessage(sender=sendData.get("sender"), 
+                            to=email,
+                            subject=sendData.get("subject"),
+                            message_text=sendData.get("message"),
+                            link=sendData.get("link"),
+                            attachment=imgAttach)
     except FileNotFoundError:
-        print(f"Error: File '{filename}' not found.")
+        print(f"Error: File not found.")
     except Exception as e:
         print(f"Error: {e}")
 

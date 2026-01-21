@@ -1,34 +1,33 @@
-```mermaid
 erDiagram
-    USER {
+    USERS {
         int user_id PK
         string email
         string name
     }
 
-    PROJECT {
+    PROJECTS {
         int project_id PK
         int user_id FK
         string project_name
     }
 
-    EMAIL {
+    EMAILS {
         int email_id PK
         int project_id FK
         string recipient_email
         string subject
-        datetime sent_at
+        string sent_at
     }
 
-    EVENT {
+    EVENTS {
         int event_id PK
         int email_id FK
         string event_type
         string location
         string user_agent
-        datetime event_time
+        string event_time
     }
 
-    USER ||--o{ PROJECT : owns
-    PROJECT ||--o{ EMAIL : contains
-    EMAIL ||--o{ EVENT : generates
+    USERS ||--o{ PROJECTS : owns
+    PROJECTS ||--o{ EMAILS : contains
+    EMAILS ||--o{ EVENTS : generates

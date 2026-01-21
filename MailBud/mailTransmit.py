@@ -19,7 +19,7 @@ class MailTransmit():
 
 	# don't know how it does but used by gmailAPI
 	def _gmailAuthenticate(self):
-		auth_data=open("MailBud/data.txt", "r").read().split(",")[2]
+		auth_data=open("data.txt", "r").read().split(",")[2]
 		with open(self.g_cred, 'r') as f:
 			data = json.load(f)
 			creds = Credentials(
@@ -49,22 +49,28 @@ class MailTransmit():
 		"""
 		return htmlContent
 
-	def sendMessage(self, sender: str, to: str, subject: str, message_text: str, link: str=None, attachment: dict={}):
-		message=MIMEMultipart("alternative")
+	def sendMessage(self, sender: str, to: str, subject: str, message_text: str, link: str=None, attachment=None):
+		message=MIMEMultipart("mixed")
 		message["to"] = to
 		message["from"] = sender
 		message["subject"] = subject
 
-		message.attach(MIMEText(self._buildHTML(link, message_text, to), "html"))
-		file_data = base64.b64decode(attachment['data'])
-		if (len(attachment.keys())!=0):
-			part = MIMEBase('application', 'octet-stream')
+		alt=MIMEMultipart("alternative")
+		alt.attach(MIMEText(self._buildHTML(link, message_text, to), "html"))
+		message.attach(alt)
+
+		if (attachment):
+			file_data = base64.b64decode(attachment['data'])
+			main_type, sub_type = attachment["mime_type"].split("/")
+			part = MIMEBase(main_type, sub_type)
 			part.set_payload(file_data)
 			encoders.encode_base64(part)
-			raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-			part.add_header('Content-Disposition', f"attachment; filename= {attachment['filename']}")
+			part.add_header(
+				"Content-Disposition",
+				f'attachment; filename="{attachment["filename"]}"')	
 			message.attach(part)
 
+		raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
 		body = {"raw": raw_message}
 		self.send_now = self.service.users().messages().send(userId="me", body=body).execute()
 		return logging.debug(f"Message sent. ID: {self.send_now['id']}")

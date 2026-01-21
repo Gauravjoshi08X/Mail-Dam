@@ -43,9 +43,10 @@ Future<void> sendFiles() async {
 
 Future<void> sendMail() async {
   try{
-  Uri.parse(
+  final uri= Uri.parse(
     "https://9xkmd6fc-5000.inc1.devtunnels.ms/sendmail"
   );
+  await http.get(uri);
   }
   catch (e){
     dev.log(e.toString());

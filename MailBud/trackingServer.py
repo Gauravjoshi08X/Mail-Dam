@@ -31,9 +31,9 @@ class TrackingServer:
         email_encrypted=self.encryptor.encryptCrutial(emailID)
         destination_encrypted=self.encryptor.encryptCrutial(destination)
 
-        log_info=f"{email_encrypted}|{opened_time}\n"
+        log_info=f"{emailID}|{opened_time}\n"
         if destination:
-            log_info=f"{email_encrypted}|{opened_time}|{destination_encrypted}\n"
+            log_info=f"{emailID}|{opened_time}|{destination}\n"
         with open(self.logs, "a") as fp:
             fp.write(log_info)
 

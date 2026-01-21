@@ -5,9 +5,12 @@ import mimetypes
 import protoMain as pm
 
 app=Flask(__name__)
+
 @app.route("/getdata", methods=["POST", "GET"])
 def getData() -> dict[str, Any]:
     data = request.get_json()
+    with open("sendData.json", "w") as fp:
+        json.dump(data,fp)
     return data
 
 @app.route("/sendfile", methods=["POST", "GET"])
@@ -16,7 +19,7 @@ def getFile() -> dict[str, Any]:
     for file in files:
         if (file.filename.split(".")[1]!="csv"):
             file_content = file.read()
-                
+
             # Encode to base64
             encoded_data = base64.b64encode(file_content).decode('utf-8')
             
@@ -24,19 +27,23 @@ def getFile() -> dict[str, Any]:
             mime_type, _ = mimetypes.guess_type(file.filename)
             if mime_type is None:
                 mime_type = 'application/octet-stream'  # Default for unknown types
-            
+
             # Create attachment object
             attachment = {
                 'filename': file.filename,
                 'data': encoded_data,
                 'mime_type': mime_type
             }
-            print(attachment)
+            with open("attach.json", "w") as fp:
+                json.dump(attachment, fp)
             return attachment
+        else:
 
-@app.route("/sendmail", methods=["POST", "GET"])
+            file.save("emails.csv")
+
+
+@app.route("/sendmail", methods=["GET"])
 def sendMail():
-    print("Mail Sent Successfully!")
     pm.SEND()
     return "Mail Sent Successfully!"
 
