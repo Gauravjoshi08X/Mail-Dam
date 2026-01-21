@@ -1,3 +1,4 @@
+```mermaid
 erDiagram
     USERS {
         int user_id PK
