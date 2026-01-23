@@ -69,6 +69,7 @@ class TrackingServer:
         destination = request.args.get("url") # gets args redirect?url="example.com"
         self._trackClickHelper(emailID, destination)
         # Redirect user to their intended destination
+        # TODO: destination is encrypted. decrypt for redirecting
         if (not destination.startswith(("http://www.", "https://www."))):
             return redirect(f"https://www.{destination}")
 

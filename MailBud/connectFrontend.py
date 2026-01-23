@@ -41,6 +41,9 @@ def getFile() -> dict[str, Any]:
 
             file.save("emails.csv")
 
+@app.route("/sendname", methods=["POST"])
+def getName() -> dict:
+    return request.get_json()
 
 @app.route("/sendmail", methods=["GET"])
 def sendMail():

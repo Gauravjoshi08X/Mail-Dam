@@ -2,6 +2,7 @@ import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 class GlobalFunction {
 static String imgPath='';
 static String csvPath='';
+// Used by below fn with class name
 static Future<String?> pickFile(OpenFileDialogType dialogType) async {
   final params = OpenFileDialogParams(
     dialogType: dialogType,
@@ -11,19 +12,19 @@ static Future<String?> pickFile(OpenFileDialogType dialogType) async {
   return filePath;
 }
 
-  Future<String?> selectImage() async {
-    final String? imagePath = await GlobalFunction.pickFile(OpenFileDialogType.image);
-    if (imagePath!=null){
-      imgPath=imagePath.toString();
-      }
-    return imagePath;
+Future<String?> selectImage() async {
+  final String? imagePath = await GlobalFunction.pickFile(OpenFileDialogType.image);
+  if (imagePath!=null){
+    imgPath=imagePath.toString();
+    }
+  return imagePath;
 }
 
-  Future<String?> selectCSV() async {
-    final String? CSVPath = await GlobalFunction.pickFile(OpenFileDialogType.document);
-    if (CSVPath!=null){
-      csvPath=CSVPath.toString();
-      }
-    return CSVPath;
+Future<String?> selectCSV() async {
+  final String? CSVPath = await GlobalFunction.pickFile(OpenFileDialogType.document);
+  if (CSVPath!=null){
+    csvPath=CSVPath.toString();
+    }
+  return CSVPath;
 }
 }
