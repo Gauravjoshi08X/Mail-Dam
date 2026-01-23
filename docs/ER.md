@@ -4,6 +4,7 @@ erDiagram
         int user_id PK
         string email
         string name
+        string refresh_token
     }
 
     PROJECTS {
