@@ -5,12 +5,12 @@ class mailUA_IP():
     def __init__(self):
         self.traces = {}
         self.values = list(self.traces.values())
+        self.encryptor: Encryptor=Encryptor()
 
     def getUserAgent_IP(self) -> None:
-        encryptor: Encryptor=Encryptor()
         try:
             # gets data and encrypts
-            list(map(lambda x: self.traces.update({x: encryptor.encryptCrutial(request.headers.__getitem__(x))}),
+            list(map(lambda x: self.traces.update({x: self.encryptor.encryptCrutial(request.headers.__getitem__(x))}),
                     ["Sec-Ch-Ua-Platform", "Sec-Ch-Ua", "X-Real-Ip"]))
         except KeyError as e:
             return e

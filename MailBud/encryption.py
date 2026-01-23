@@ -1,5 +1,4 @@
 from cryptography.fernet import Fernet
-from cryptography import exceptions
 from dotenv import load_dotenv
 import os
 

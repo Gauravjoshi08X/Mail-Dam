@@ -2,7 +2,6 @@ import csv, json
 from mailTransmit import MailTransmit
 from iterEmails import iterEmail
 def SEND():
-    # filename:str = input("Enter the CSV filename: ")
     mail=MailTransmit("https://9xkmd6fc-5000.inc1.devtunnels.ms", r"C:\Users\Gaurav\VSCode\Mail-Dam\src\certs\g_cred.json")
     try:
         mailData = open("sendData.json", "r")
