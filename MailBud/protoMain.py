@@ -1,8 +1,9 @@
-import json, os
+import os
 from mailTransmit import MailTransmit
-from iterEmails import iterEmail
+from MailBud.utils.iterEmails import iterEmail
+import json
 def SEND():
-    mail=MailTransmit("https://9xkmd6fc-5000.inc1.devtunnels.ms", r"C:\Users\Gaurav\VSCode\Mail-Dam\src\certs\g_cred.json")
+    mail=MailTransmit("https://9xkmd6fc-5010.inc1.devtunnels.ms", r"C:\Users\Gaurav\VSCode\Mail-Dam\src\certs\g_cred.json")
     try:
         send_data = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sendData.json")
         mailData = open(send_data, "r")
@@ -19,10 +20,8 @@ def SEND():
                             attachment=imgAttach)
         imgData.close()
         mailData.close()
+        
     except FileNotFoundError:
         print(f"Error: File not found.")
     except Exception as e:
         print(f"Error: {e}")
-
-if __name__=="__main__":
-    SEND()

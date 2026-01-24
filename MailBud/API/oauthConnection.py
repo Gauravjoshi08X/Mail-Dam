@@ -2,7 +2,7 @@ from flask import Flask, redirect, request
 from google_auth_oauthlib.flow import Flow
 import requests
 import os
-from databaseConnect import DatabaseInsert
+from MailBud.utils.databaseConnect import DatabaseInsert
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -61,4 +61,4 @@ def oauth_callback():
         return f"OAuth failed: {e}", 500
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

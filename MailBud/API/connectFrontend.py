@@ -2,8 +2,7 @@ from flask import Flask, request, jsonify, json
 from typing import Any
 import base64
 import mimetypes
-import protoMain as pm
-import databaseConnect as dc
+import MailBud.utils.databaseConnect as dc
 
 app=Flask(__name__)
 
@@ -52,8 +51,8 @@ def getName() -> dict:
 
 @app.route("/sendmail", methods=["GET"])
 def sendMail():
-    pm.SEND()
-    return "Mail Sent Successfully!"
+    # SEND()
+    return jsonify({"msg": "Mail Sent Successfully!"})
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5005)

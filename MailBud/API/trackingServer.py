@@ -1,12 +1,12 @@
 from flask import Flask, request, redirect, Response
-from encryption import Encryptor
+from MailBud.utils.encryption import Encryptor
 import flask as fk
 import time, os
 
 # Custom modules
-from mailUA_IP import mailUA_IP
-from locateIP import trackIP
-import maiLanding
+from MailBud.utils.mailUA_IP import mailUA_IP
+from MailBud.utils.locateIP import trackIP
+import MailBud.utils.maiLanding as maiLanding
 
 class TrackingServer:
     # Global Variables
@@ -75,4 +75,4 @@ class TrackingServer:
 
 if __name__ == '__main__':
     server=TrackingServer()
-    server.app.run(debug=True)
+    server.app.run(debug=True, port=5010)

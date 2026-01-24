@@ -1,6 +1,6 @@
 from flask import request
-from encryption import Encryptor
-import databaseConnect
+from MailBud.utils.encryption import Encryptor
+import MailBud.utils.databaseConnect as databaseConnect
 class mailUA_IP():
     def __init__(self):
         self.traces = {}

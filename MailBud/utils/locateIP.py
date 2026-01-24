@@ -1,6 +1,6 @@
 import requests
 import json
-from encryption import Encryptor
+from MailBud.utils.encryption import Encryptor
 
 def trackIP(path: str="src/logs/traces.json") -> None:
     encryptor: Encryptor=Encryptor()
