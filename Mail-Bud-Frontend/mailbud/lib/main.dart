@@ -167,9 +167,9 @@ String? selectedCSV;
           reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(senderEmail: senderControl.text, message: messageControl.text, subject: subjectControl.text, link: linkControl.text)),
           reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255),
           () async {
-            // await connect_backend.sendData(project: projectControl.text, senderEmail: senderControl.text, subject: subjectControl.text, message: messageControl.text, link: linkControl.text);
-                    // await connect_backend.sendFiles();
-                    await connect_backend.sendMail();
+            await connect_backend.sendData(project: projectControl.text, senderEmail: senderControl.text, subject: subjectControl.text, message: messageControl.text, link: linkControl.text);
+                await connect_backend.sendFiles();
+                await connect_backend.sendMail();
           }),
         ])), 
       ])

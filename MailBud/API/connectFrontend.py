@@ -10,8 +10,6 @@ app=Flask(__name__)
 @app.route("/getdata", methods=["POST", "GET"])
 def getData() -> dict[str, Any]:
     data = request.get_json()
-    with open("sendData.json", "w") as fp:
-        json.dump(data,fp)
     return data
 
 @app.route("/sendfile", methods=["POST", "GET"])
@@ -46,27 +44,29 @@ def getFile() -> dict[str, Any]:
 def getName() -> dict:
     data = request.get_json()
     user: str=data.get("name").strip()
-    rt: str=dc.DatabaseFetch().fetchRTData(user);
-    response={"isUser": dc.DatabaseFetch().isUser(user), "refresh_token": rt}
-    return response.get("refresh_token")
+    with open("MailBud/transit/user.txt", "w") as fp:
+        fp.write(user)
+    response={"isUser": dc.DatabaseFetch().isUser(user)}
+    return response
 
 @app.route("/sendmail", methods=["GET"])
 def sendMail():
-    rt="1//0gAyvIEgTbh14CgYIARAAGBASNwF-L9IrHXYiCDxMQHXZKy21alPMXk7IT7w5OnTNm8yUnmnR8YM45xLrOf3sYaVXgFrK9Bysmb8"
-    mail=MailTransmit("https://9xkmd6fc-5010.inc1.devtunnels.ms", "src/certs/g_cred.json", rt)
-    try:
-        with open("MailBud/transit/sendData.json", "r") as mailData:
-            with open("MailBud/transit/attach.json", "r") as fileData:
-                sendData: dict=json.load(mailData)
-                fileAttach: dict=json.load(fileData)
-                for email in iterEmail():
-                    mail.sendMessage(sender=sendData.get("sender"), to=email,
-                                    subject=sendData.get("subject"),
-                                    message_text=sendData.get("message"),
-                                    link=sendData.get("link"), attachment=fileAttach)
-    except Exception as e:
-        print(f"Error: {e}")
+    with open("MailBud/transit/user.txt", "r") as fp:
+        rt=dc.DatabaseFetch().fetchRTData(fp.read())
+        mail=MailTransmit("https://9xkmd6fc-5010.inc1.devtunnels.ms", "src/certs/g_cred.json", rt)
+    # try:
+    with open("MailBud/transit/sendData.json", "r") as mailData:
+        with open("MailBud/transit/attach.json", "r") as fileData:
+            sendData: dict=json.load(mailData)
+            fileAttach: dict=json.load(fileData)
+            for email in iterEmail():
+                mail.sendMessage(sender=sendData.get("sender"), to=email,
+                                subject=sendData.get("subject"),
+                                message_text=sendData.get("message"),
+                                link=sendData.get("link"), attachment=fileAttach)
+    # except Exception as e:
+    #     print(f"Error: {e}")
     return {"msg": "Mail Sent Successfully!"}
-
+    
 if __name__=="__main__":
     app.run(debug=True, port=5005)
