@@ -24,7 +24,7 @@ class MailTransmit():
 			data = json.load(f)
 			creds = Credentials(
 			token=None,  # access token will be auto-fetched
-			refresh_token="1//0gAyvIEgTbh14CgYIARAAGBASNwF-L9IrHXYiCDxMQHXZKy21alPMXk7IT7w5OnTNm8yUnmnR8YM45xLrOf3sYaVXgFrK9Bysmb8",
+			refresh_token="SET_Refresh_Token",
 			client_id=data['web']['client_id'],
 			client_secret=data['web']['client_secret'],
 			token_uri="https://oauth2.googleapis.com/token",
