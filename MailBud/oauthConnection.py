@@ -2,6 +2,8 @@ from flask import Flask, redirect, request
 from google_auth_oauthlib.flow import Flow
 import requests
 import os
+from databaseConnect import DatabaseInsert
+
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 app = Flask(__name__)
@@ -50,11 +52,9 @@ def oauth_callback():
         ).json()
 
         path = os.path.join(BASE_DIR, "data.txt")
-        with open(path, "w") as f:
-            f.write(f"{userinfo['email']},{userinfo['name']},{creds.refresh_token}")
+        DatabaseInsert.insertUserData(userinfo['email'],userinfo['name'],creds.refresh_token)
 
-        print("File written successfully")
-        return "OAuth completed, file saved!"
+        return "OAuth completed"
 
     except Exception as e:
         print("Error in OAuth callback:", e)

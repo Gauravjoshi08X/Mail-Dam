@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from  email import encoders
 import base64, logging, json
-
+# import connectFrontend
 
 class MailTransmit():
 	# Installed App Flow requires a sequence of strings to request during the flow
@@ -19,12 +19,12 @@ class MailTransmit():
 
 	# don't know how it does but used by gmailAPI
 	def _gmailAuthenticate(self):
-		auth_data=open("data.txt", "r").read().split(",")[2]
+		# refresh_token: str=connectFrontend.getName().get("refresh_token")
 		with open(self.g_cred, 'r') as f:
 			data = json.load(f)
 			creds = Credentials(
 			token=None,  # access token will be auto-fetched
-			refresh_token=auth_data,
+			refresh_token="1//0gAyvIEgTbh14CgYIARAAGBASNwF-L9IrHXYiCDxMQHXZKy21alPMXk7IT7w5OnTNm8yUnmnR8YM45xLrOf3sYaVXgFrK9Bysmb8",
 			client_id=data['web']['client_id'],
 			client_secret=data['web']['client_secret'],
 			token_uri="https://oauth2.googleapis.com/token",

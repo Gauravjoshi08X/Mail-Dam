@@ -41,12 +41,13 @@ class LoginPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
           Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-          child: reuseable.ReusableComponents().fields("Enter a nickname", nameControl, 1, (value){connect_backend.sendName(value);})),
+          child: reuseable.ReusableComponents().fields("Enter a nickname", nameControl, 1, (value) async{
+            await connect_backend.sendName(value)?Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(title: "Mail bud"))):"";
+            })),
           Padding(padding:  EdgeInsetsGeometry.symmetric(vertical: 10), child: Text("or", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: Color.fromRGBO(224, 225, 231, 1)))),
           ElevatedButton(
           onPressed: () {
             connect_backend.openAuth();
-            Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(title: "Mail bud")));
           },
           child: Padding(
           padding: EdgeInsetsGeometry.only(top: 10, bottom: 10),

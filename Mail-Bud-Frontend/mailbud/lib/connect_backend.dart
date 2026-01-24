@@ -15,19 +15,25 @@ Future<void> openAuth() async {
   );
 }
 
-Future<void> sendName(String name) async
+Future<bool> sendName(String name) async
 {
   try{
     final url=Uri.parse("https://9xkmd6fc-5000.inc1.devtunnels.ms/sendname");
     final response=(await http.post(url,
-    headers: {"Content-Type": "Application/Json"},
+    headers: {"Content-Type": "application/json"},
     body: jsonEncode({"name": name})));
-    dev.log(response.statusCode.toString());
+    final isUser=jsonDecode(response.body)["isUser"];
+    if (isUser){
+      return true;
+    }
+    else{
+      return false;
+    }
   } catch (e){
     dev.log(e.toString());
+    return  false;
   }
 }
-
 
 Future<void> sendData({String? project, String? senderEmail, String? subject, String? message, String? link}) async {
   try {

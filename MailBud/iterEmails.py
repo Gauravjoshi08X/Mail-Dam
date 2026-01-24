@@ -1,7 +1,8 @@
-import csv
+import csv, os
 def iterEmail() -> list:
+    csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "emails.csv")
     emails=[]
-    with open("emails.csv") as fp:
+    with open(csv_path) as fp:
         item=csv.reader(fp)
         row=list(map(lambda x: x.lower(),item.__next__()))
         if ("email" in row or "emails" in row):

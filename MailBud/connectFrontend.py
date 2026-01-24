@@ -1,8 +1,9 @@
-from flask import Flask, request, json
+from flask import Flask, request, jsonify, json
 from typing import Any
 import base64
 import mimetypes
 import protoMain as pm
+import databaseConnect as dc
 
 app=Flask(__name__)
 
@@ -43,7 +44,11 @@ def getFile() -> dict[str, Any]:
 
 @app.route("/sendname", methods=["POST"])
 def getName() -> dict:
-    return request.get_json()
+    data = request.get_json()
+    user: str=data.get("name").strip()
+    rt: str=dc.DatabaseFetch().fetchRTData(user);
+    response={"isUser": dc.DatabaseFetch().isUser(user), "refresh_token": rt}
+    return jsonify(response)
 
 @app.route("/sendmail", methods=["GET"])
 def sendMail():
