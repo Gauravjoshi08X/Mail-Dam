@@ -18,7 +18,7 @@ class MailTransmit():
 
 	# don't know how it does but used by gmailAPI
 	def _gmailAuthenticate(self):
-		refresh_token: str=connectFrontend.getName().get("refresh_token")
+		refresh_token: str="1//0gAyvIEgTbh14CgYIARAAGBASNwF-L9IrHXYiCDxMQHXZKy21alPMXk7IT7w5OnTNm8yUnmnR8YM45xLrOf3sYaVXgFrK9Bysmb8"
 		with open(self.g_cred, 'r') as f:
 			data = json.load(f)
 			creds = Credentials(

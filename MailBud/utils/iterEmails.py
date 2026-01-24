@@ -1,6 +1,6 @@
-import csv, os
+import csv
 def iterEmail() -> list:
-    csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "transit/emails.csv")
+    csv_path = "MailBud/transit/emails.csv"
     emails=[]
     with open(csv_path) as fp:
         item=csv.reader(fp)
