@@ -3,7 +3,8 @@ from typing import Any
 import base64
 import mimetypes
 from MailBud.utils import databaseConnect as dc
-
+from MailBud.mailTransmit import MailTransmit
+from MailBud.utils.iterEmails import iterEmail
 app=Flask(__name__)
 
 @app.route("/getdata", methods=["POST", "GET"])
@@ -47,12 +48,25 @@ def getName() -> dict:
     user: str=data.get("name").strip()
     rt: str=dc.DatabaseFetch().fetchRTData(user);
     response={"isUser": dc.DatabaseFetch().isUser(user), "refresh_token": rt}
-    return jsonify(response)
+    return response.get("refresh_token")
 
 @app.route("/sendmail", methods=["GET"])
 def sendMail():
-    # pm.SEND()
-    return jsonify({"msg": "Mail Sent Successfully!"})
+    rt="1//0gAyvIEgTbh14CgYIARAAGBASNwF-L9IrHXYiCDxMQHXZKy21alPMXk7IT7w5OnTNm8yUnmnR8YM45xLrOf3sYaVXgFrK9Bysmb8"
+    mail=MailTransmit("https://9xkmd6fc-5010.inc1.devtunnels.ms", "src/certs/g_cred.json", rt)
+    try:
+        with open("MailBud/transit/sendData.json", "r") as mailData:
+            with open("MailBud/transit/attach.json", "r") as fileData:
+                sendData: dict=json.load(mailData)
+                fileAttach: dict=json.load(fileData)
+                for email in iterEmail():
+                    mail.sendMessage(sender=sendData.get("sender"), to=email,
+                                    subject=sendData.get("subject"),
+                                    message_text=sendData.get("message"),
+                                    link=sendData.get("link"), attachment=fileAttach)
+    except Exception as e:
+        print(f"Error: {e}")
+    return {"msg": "Mail Sent Successfully!"}
 
 if __name__=="__main__":
     app.run(debug=True, port=5005)

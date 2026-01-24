@@ -4,25 +4,24 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from  email import encoders
-import base64, logging, json, MailBud.API.connectFrontend as connectFrontend
+import base64, logging, json
 
 class MailTransmit():
 	# Installed App Flow requires a sequence of strings to request during the flow
 	SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
-	def __init__(self, serverLink, g_cred):
+	def __init__(self, serverLink, g_cred, rt):
 		self.serverLink=serverLink
 		self.g_cred=g_cred
-		self.service=self._gmailAuthenticate()
+		self.service=self._gmailAuthenticate(rt)
 
 	# don't know how it does but used by gmailAPI
-	def _gmailAuthenticate(self):
-		refresh_token: str=""
+	def _gmailAuthenticate(self, rt: str):
 		with open(self.g_cred, 'r') as f:
 			data = json.load(f)
 			creds = Credentials(
 			token=None,  # access token will be auto-fetched
-			refresh_token=refresh_token,
+			refresh_token=rt,
 			client_id=data['web']['client_id'],
 			client_secret=data['web']['client_secret'],
 			token_uri="https://oauth2.googleapis.com/token",
