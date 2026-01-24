@@ -14,11 +14,10 @@ class MailTransmit():
 		self.serverLink=serverLink
 		self.g_cred=g_cred
 		self.service=self._gmailAuthenticate()
-		
 
 	# don't know how it does but used by gmailAPI
 	def _gmailAuthenticate(self):
-		refresh_token: str="1//0gAyvIEgTbh14CgYIARAAGBASNwF-L9IrHXYiCDxMQHXZKy21alPMXk7IT7w5OnTNm8yUnmnR8YM45xLrOf3sYaVXgFrK9Bysmb8"
+		refresh_token: str=""
 		with open(self.g_cred, 'r') as f:
 			data = json.load(f)
 			creds = Credentials(
