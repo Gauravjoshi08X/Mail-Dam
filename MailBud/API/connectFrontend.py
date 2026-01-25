@@ -63,12 +63,12 @@ class Config:
         sendr=dc().fetchEmailData(user)
         mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
         try:
+            di().insertPRJData(mailData.get("project"), user)
             with open("MailBud/transit/attach.json", "r") as fileData:
                 fileAttach: dict=json.load(fileData)
                 for email in iterEmail():
                     mail.sendMessage(sender=sendr, to=email, subject=mailData.get("subject"),message_text=mailData.get("message"),link=mailData.get("link"), attachment=fileAttach)
                     di().insertEmailData(email, mailData.get("subject"), str(time.strftime("%Y:%m:%d %H:%M:%S")))
-                di().insertPRJData(mailData.get("project"))
         except Exception as e:
             print(f"Error: {e}")
         return {"msg": "Mail Sent Successfully!"}

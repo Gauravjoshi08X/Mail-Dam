@@ -19,14 +19,14 @@ class DatabaseInsert():
 				cur.execute(event_query, (email, uname, refresh_token))
 				conn.commit()
 
-	def insertPRJData(self, project: str) -> None:
+	def insertPRJData(self, project: str, user: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""INSERT INTO project (project_name, user_id)
 				VALUES (
 					%s,%s
 				);"""
-				cur.execute(event_query, (project, DatabaseFKFetch().fetchFKData("user_id", "users")))
+				cur.execute(event_query, (project, DatabaseFKFetch().fetchUserFKData(user)))
 				conn.commit()
 
 	def insertOpenEventData(self, event_time: str) -> None:
@@ -64,11 +64,19 @@ class DatabaseFKFetch():
 		self.user=os.getenv("DBUSER")
 		self.password=os.getenv("DBPASSWORD")
 
-	def fetchFKData(self,id, table) -> int:
+	def fetchFKData(self,id: str, table: str) -> int:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query=f"""SELECT MAX({id}) FROM {table};"""
 				cur.execute(event_query)
+				result=cur.fetchone()
+				return result[0]
+
+	def fetchUserFKData(self, uname: str)->int:
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
+			with conn.cursor() as cur:
+				event_query="""SELECT user_id FROM users where uname=%s;"""
+				cur.execute(event_query, (uname,))
 				result=cur.fetchone()
 				return result[0]
 
