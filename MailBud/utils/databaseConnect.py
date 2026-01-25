@@ -34,7 +34,7 @@ class DatabaseInsert():
 			with conn.cursor() as cur:
 				event_query="""INSERT INTO event (email_id, project_id, event_time, open)
 				VALUES (
-					%s,%s,%s
+					%s,%s,%s,%s
 				);"""
 				cur.execute(event_query, (DatabaseFKFetch().fetchFKData("email_id", "email"), DatabaseFKFetch().fetchFKData("project_id", "project"), event_time, True))
 				conn.commit()
@@ -45,7 +45,7 @@ class DatabaseInsert():
 				event_query="""UPDATE event
 				set click=%s, location=%s
 				WHERE email_id=%s;"""
-				cur.execute(event_query, (True, location))
+				cur.execute(event_query, (True, location, DatabaseFKFetch().fetchFKData("email_id", "email")))
 				conn.commit()
 
 	def insertEmailData(self, recipient: str, subject: str, sent_at: str) -> None:
@@ -116,8 +116,18 @@ class DatabaseFetch():
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""
-				select count(open), count(click) from event where project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s;));
+		SELECT COUNT(DISTINCT open) FILTER (WHERE open = true) AS unique_opens,
+		COUNT(DISTINCT click) FILTER (WHERE click = true) AS unique_clicks
+		FROM event
+		WHERE project_id = (
+		SELECT max(project_id)
+		FROM project
+		WHERE user_id = (
+			SELECT user_id FROM users WHERE uname = %s
+		)
+		);
 				"""
 				cur.execute(event_query, (user,))
-				result=cur.fetchone()
+				result=cur.fetchall()
 				return result
+

@@ -11,7 +11,7 @@ import MailBud.utils.maiLanding as maiLanding
 class TrackingServer:
     # Global Variables
     # mailFolder: str=maiLanding.mailLand()
-    def __init__(self, tracker: str="src/static/trackingPixel.png"):
+    def __init__(self, tracker: str=r"C:\Users\Gaurav\VSCode\Mail-Dam\src\static\trackingPixel.png"):
         self.app = Flask(__name__) 
         self.encryptor: Encryptor=Encryptor()
         self.tracker=tracker
@@ -20,35 +20,31 @@ class TrackingServer:
         self.app.add_url_rule('/click/redirect', view_func=self.trackClick)
 
     def _logEvents(self, destination: str="")->None:
-        opened_time=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
-        print(f"Email opened at: {opened_time}")
-        # dc.DatabaseInsert().insertOpenEventData(opened_time, True)
-        if destination:
-            with open("src/logs/traces.json") as fp:
-                location=json.load(fp).get("X-Real-City")
-                print(location)
-                # dc.DatabaseInsert().insertEventData(location=location)
+        if (destination==""):
+            opened_time=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
+            dc.DatabaseInsert().insertOpenEventData(opened_time)
+        else:
+            # with open("src/logs/traces.json") as fp:
+                # location=json.load(fp).get("X-Real-City")
+            dc.DatabaseInsert().insertEventData(location="Kathmandu")
     # With no link
     '''
     This doc is written for me to not wander to find main function.
     sendTracker
     '''
 
-    # TODO:  Fix duplicate entry
     def sendTracker(self) -> Response:
-        print(True)
         self._logEvents()
         response=fk.send_file(self.tracker, mimetype="image/png")
         # kinda forcing agent to return these
         response.headers["Accept-CH"] = "Sec-CH-UA, Sec-CH-UA-Platform"
         # this restricts browser to cache tracker but may not work with gmail
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-        print(response)
         return response
     
     # With Link
     def _trackClickHelper(self, destination: str)-> None:
-        trackIP()
+        # trackIP()
         self._logEvents(destination)
 
     '''
@@ -60,10 +56,9 @@ class TrackingServer:
         destination = request.args.get("url") # gets args redirect?url="example.com"
         self._trackClickHelper(destination)
         # Redirect user to their intended destination
-        # TODO: destination is encrypted. decrypt for redirecting
         if (not destination.startswith(("http://www.", "https://www."))):
             return redirect(f"https://www.{destination}")
 
 if __name__ == '__main__':
     server=TrackingServer()
-    server.app.run(debug=True, port=5010)
+    server.app.run(debug=True, port=5000)

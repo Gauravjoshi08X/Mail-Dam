@@ -15,7 +15,7 @@ class Config:
     def __init__(self):
         self.app=Flask(__name__)
         self.app.secret_key=os.getenv("FLASK_SECRET_KEY")
-        self.tunnel_url: str = os.getenv("TUNNEL")
+        self.tunnel_url: str = os.getenv("MAIL_TUNNEL")
         self.app.add_url_rule("/sendfile", view_func=self.getFile, methods=["POST", "GET"])
         self.app.add_url_rule("/sendname", view_func=self.getName, methods=["POST"])
         self.app.add_url_rule("/getname", view_func=self.getName, methods=["POST"])

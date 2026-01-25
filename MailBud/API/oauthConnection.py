@@ -12,7 +12,7 @@ class OauthConnection:
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
         self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        self.tunnel_url: str = os.getenv("TUNNEL")
+        self.tunnel_url: str = os.getenv("AUTH_TUNNEL")
         self.SCOPES = [
             "openid",
             "https://www.googleapis.com/auth/userinfo.email",
