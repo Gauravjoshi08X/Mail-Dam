@@ -2,19 +2,15 @@ import psycopg2
 import dotenv, os
 
 dotenv.load_dotenv("src/certs/credential.env")
-name=os.getenv("DBNAME")
-user=os.getenv("DBUSER")
-password=os.getenv("DBPASSWORD")
 
 class DatabaseInsert():
 	def __init__(self):
 		self.name=os.getenv("DBNAME")
 		self.user=os.getenv("DBUSER")
 		self.password=os.getenv("DBPASSWORD")
-		self.fetchpk=DatabasePKFetch()
 	@staticmethod
-	def insertUserData(email: str, uname: str, refresh_token: str) -> None:
-		with psycopg2.connect(f"dbname={name} user={user} password={password}") as conn:
+	def insertUserData(self, email: str, uname: str, refresh_token: str) -> None:
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""INSERT INTO users (email, uname, refresh_token)
 				VALUES (
@@ -33,20 +29,29 @@ class DatabaseInsert():
 				cur.execute(event_query, (project, self.fetchpk.fetchFKData("user_id", "users")))
 				conn.commit()
 
-	def insertEventData(self, location: str, useragent: str, event_time: str, opened: str, click: str) -> None:
+	def insertOpenEventData(self, event_time: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
-				event_query="""INSERT INTO project (email_id, location, user_agent, event_time, open, click)
+				event_query="""INSERT INTO event (email_id, project_id, event_time, open)
 				VALUES (
-					%s,%s,%s,%s,%s,%s
+					%s,%s,%s
 				);"""
-				cur.execute(event_query, (self.fetchpk.fetchFKData("email_id", "email"), location, useragent, event_time, opened, click))
+				cur.execute(event_query, (self.fetchpk.fetchFKData("email_id", "email"), self.fetchpk.fetchFKData("project_id", "project"), event_time, True))
+				conn.commit()
+
+	def insertEventData(self, location: str) -> None:
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
+			with conn.cursor() as cur:
+				event_query="""UPDATE event
+				set click=%s, location=%s
+				WHERE email_id=%s;"""
+				cur.execute(event_query, (True, location))
 				conn.commit()
 
 	def insertEmailData(self, recipient: str, subject: str, sent_at: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
-				event_query="""INSERT INTO project (project_id, recipient, subject, sent_at)
+				event_query="""INSERT INTO email (project_id, recipient, subject, sent_at)
 				VALUES (
 					%s,%s,%s,%s
 				);"""
@@ -87,6 +92,14 @@ class DatabaseFetch():
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""SELECT refresh_token from users where uname=%s"""
+				cur.execute(event_query, (user,))
+				result=cur.fetchone()
+				return result[0]
+
+	def fetchEmailData(self,user) -> str:
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
+			with conn.cursor() as cur:
+				event_query="""SELECT email from users where uname=%s"""
 				cur.execute(event_query, (user,))
 				result=cur.fetchone()
 				return result[0]

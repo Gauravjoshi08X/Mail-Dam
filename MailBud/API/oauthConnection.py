@@ -4,61 +4,65 @@ import requests
 import os
 from MailBud.utils.databaseConnect import DatabaseInsert
 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+class OauthConnection:
+    def __init__(self):
+        self.app = Flask(__name__)
+        self.app.secret_key = "your_secret_key"
 
-app = Flask(__name__)
+        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SCOPES = [
-    "openid",
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/userinfo.profile",
-    "https://www.googleapis.com/auth/gmail.send"
-]
+        self.BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        self.tunnel_url: str = os.getenv("TUNNEL")
+        self.SCOPES = [
+            "openid",
+            "https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/gmail.send"
+        ]
+        self.CLIENT_SECRETS = r"src/certs/g_cred.json"
+        self.REDIRECT_URI = f"{self.tunnel_url}/oauth/callback"
 
-CLIENT_SECRETS = r"C:\Users\Gaurav\VSCode\Mail-Dam\src\certs\g_cred.json"
-REDIRECT_URI = "https://9xkmd6fc-5000.inc1.devtunnels.ms/oauth/callback"
+        self.app.add_url_rule('/auth/google', view_func=self.auth_google)
+        self.app.add_url_rule('/oauth/callback', view_func=self.oauth_callback)
 
-@app.route("/auth/google")
-def auth_google():
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS,
-        scopes=SCOPES,
-        redirect_uri=REDIRECT_URI
-    )
-
-    auth_url, _ = flow.authorization_url(
-        access_type="offline",
-        prompt="consent"
-    )
-
-    return redirect(auth_url)
-
-@app.route("/oauth/callback")
-def oauth_callback():
-    try:
-        flow = Flow.from_client_secrets_file(
-            CLIENT_SECRETS,
-            scopes=SCOPES,
-            redirect_uri=REDIRECT_URI
+    def auth_google(self):
+        self.flow = Flow.from_client_secrets_file(
+            self.CLIENT_SECRETS,
+            scopes=self.SCOPES,
+            redirect_uri=self.REDIRECT_URI
+        )
+        
+        auth_url, _ = self.flow.authorization_url(
+            access_type="offline",
+            prompt="consent"
         )
 
-        flow.fetch_token(authorization_response=request.url)
-        creds = flow.credentials
+        return redirect(auth_url)
 
-        userinfo = requests.get(
-            "https://www.googleapis.com/oauth2/v2/userinfo",
-            headers={"Authorization": f"Bearer {creds.token}"}
-        ).json()
+    def oauth_callback(self):
+        try:
+            flow = Flow.from_client_secrets_file(
+                self.CLIENT_SECRETS,
+                scopes=self.SCOPES,
+                redirect_uri=self.REDIRECT_URI
+            )
+            
+            flow.fetch_token(authorization_response=request.url)
+            creds = flow.credentials
+            
+            userinfo = requests.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {creds.token}"}
+            ).json()
+            
+            DatabaseInsert.insertUserData(userinfo['email'], userinfo['name'], creds.refresh_token)
+            
+            return "OAuth completed"
+        
+        except Exception as e:
+            print("Error in OAuth callback:", e)
+            return f"OAuth failed: {e}", 500
 
-        path = os.path.join(BASE_DIR, "data.txt")
-        DatabaseInsert.insertUserData(userinfo['email'],userinfo['name'],creds.refresh_token)
-
-        return "OAuth completed"
-
-    except Exception as e:
-        print("Error in OAuth callback:", e)
-        return f"OAuth failed: {e}", 500
-
-if __name__=="__main__":
-    app.run(debug=True, port=5000)
+if __name__ == "__main__":
+    oauth_conn = OauthConnection()
+    oauth_conn.app.run(port=5000)

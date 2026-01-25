@@ -7,9 +7,6 @@ from  email import encoders
 import base64, logging, json
 
 class MailTransmit():
-	# Installed App Flow requires a sequence of strings to request during the flow
-	SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
-
 	def __init__(self, serverLink, g_cred, rt):
 		self.serverLink=serverLink
 		self.g_cred=g_cred
@@ -30,16 +27,16 @@ class MailTransmit():
 		return build("gmail", "v1", credentials=creds)
 
 	# function to build html template for different version of link
-	def _buildHTML(self, link: str|None, message_text: str, to: str) -> str:
+	def _buildHTML(self, link: str|None, message_text: str) -> str:
 		linkHTML=""
 		if link:
-			linkHTML=f"""<a href="{self.serverLink}/click/{to}/redirect?url={link}">{link}</a>"""
+			linkHTML=f"""<a href="{self.serverLink}/click/redirect?url={link}">{link}</a>"""
 		# Embed tracking pixel
 		htmlContent = f"""
 			<html>
 				<body>
 				<p>{message_text}</p>
-				<img src="{self.serverLink}/static/{to}" width="1" height="1"/>
+				<img src="{self.serverLink}/static" width="1" height="1"/>
 				{linkHTML}
 				</body>
 			</html>

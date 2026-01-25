@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'util/connect_backend.dart' as connect_backend;
 import 'util/reusable_components.dart' as reuseable;
 import 'util/global_function.dart' as global_fn;
@@ -36,31 +35,26 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-          Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-          child: reuseable.ReusableComponents().fields("Enter a nickname", nameControl, 1, (value) async{
-            await connect_backend.sendName(value)?Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(title: "Mail bud"))):"";
-            })),
-          Padding(padding:  EdgeInsetsGeometry.symmetric(vertical: 10), child: Text("or", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: Color.fromRGBO(224, 225, 231, 1)))),
-          ElevatedButton(
-          onPressed: () {
-            connect_backend.openAuth();
-          },
-          child: Padding(
-          padding: EdgeInsetsGeometry.only(top: 10, bottom: 10),
-          child: Row(mainAxisSize: MainAxisSize.min,
-           spacing: 20,
-           children: [SvgPicture.string(google),Text("Continue with Google", style: TextStyle(fontSize: 22),)
-          ]))
-        ),
-      ],
-      ),
-    ));
-  }
-}
+      body: Padding(padding: EdgeInsetsGeometry.only(top: 80, left: 30, right: 30), child: Column(
+        spacing: 12,
+        children: [
+          Text("Welcome", style: TextStyle(fontFamily: "sans-serif", fontSize: 36, color: Color.fromRGBO(224, 225, 231, 1)),),
+          Text("Sign in with continue", style: TextStyle(fontFamily: "sans-serif", fontSize: 18, color: Color.fromRGBO(224, 225, 231, .65)),),
+          Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 16), child: reuseable.ReusableComponents().loginButton(google, Color.fromRGBO(18, 18, 18, 1), connect_backend.openAuth)),
+          
+          Row(children: [
+          Expanded(child: Divider(endIndent: 25)),
+          Center(child: Text("or", style: TextStyle(fontFamily: "sans-serif", fontSize: 14),)),
+          Expanded(child: Divider(indent: 25)),
+        ]),
+        Padding(padding: EdgeInsetsGeometry.symmetric(vertical: 30), child: reuseable.ReusableComponents().fields("Enter your name", nameControl, 1)),
+        reuseable.ReusableComponents().loginButton("", Color.fromRGBO(27, 38, 103, 1),
+         ()async{
+            await connect_backend.sendName(nameControl.text)?Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePage(title: "Mail bud"))):"";
+         },
+        text: "Continue")
+        ])));}
+        }
 
 
 
@@ -77,7 +71,6 @@ class _MyHomePageState extends State<MyHomePage>{
     SVGContent svg = SVGContent();
 
 final TextEditingController projectControl=TextEditingController();
-final TextEditingController senderControl=TextEditingController();
 final TextEditingController subjectControl=TextEditingController();
 final TextEditingController linkControl=TextEditingController();
 final TextEditingController messageControl=TextEditingController();
@@ -131,9 +124,8 @@ String? selectedCSV;
         spacing: 15,
         children: [
 
-      reuseable.ReusableComponents().fields("Enter Project name", projectControl, 1, (value){}),
-      reuseable.ReusableComponents().fields("Enter Company's email", senderControl, 1, (value){}),
-      reuseable.ReusableComponents().fields("Enter Subject", subjectControl, 1, (value){}),
+      reuseable.ReusableComponents().fields("Enter Project name", projectControl, 1),
+      reuseable.ReusableComponents().fields("Enter Subject", subjectControl, 1),
 
       Row(
       children: [
@@ -157,17 +149,17 @@ String? selectedCSV;
       context),
       ]),
 
-      reuseable.ReusableComponents().fields("Enter Message", messageControl, 5, (value){}),
-      reuseable.ReusableComponents().fields("Enter a link (Optional)", linkControl, 1, (value){}),
+      reuseable.ReusableComponents().fields("Enter Message", messageControl, 5),
+      reuseable.ReusableComponents().fields("Enter a link (Optional)", linkControl, 1),
 
       Padding(padding: EdgeInsetsGeometry.only(left: 17),
         child: Row(
           spacing: MediaQuery.of(context).size.width*.2,
           children: [
-          reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(senderEmail: senderControl.text, message: messageControl.text, subject: subjectControl.text, link: linkControl.text)),
+          reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(message: messageControl.text, subject: subjectControl.text, link: linkControl.text)),
           reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255),
           () async {
-            await connect_backend.sendData(project: projectControl.text, senderEmail: senderControl.text, subject: subjectControl.text, message: messageControl.text, link: linkControl.text);
+            await connect_backend.sendData(project: projectControl.text, subject: subjectControl.text, message: messageControl.text, link: linkControl.text);
                 await connect_backend.sendFiles();
                 await connect_backend.sendMail();
           }),

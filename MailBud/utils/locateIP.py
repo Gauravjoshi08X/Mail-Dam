@@ -1,17 +1,14 @@
 import requests
 import json
-from MailBud.utils.encryption import Encryptor
-
+from flask import request
 def trackIP(path: str="src/logs/traces.json") -> None:
-    encryptor: Encryptor=Encryptor()
     try:
-        with open(path, "r") as fp:
-            all_data: dict = json.load(fp)
-        # ip_data is encrypted by mailUA_IP module
-        ip_data = encryptor.decryptCrutial(all_data.get("X-Real-Ip"))
+        all_data={}
+        ip_data=request.headers.__getitem__("X-Real-Ip")
+        print(f"IP Address: {ip_data}")
         url = f"http://ip-api.com/json/{ip_data}"
         city = requests.get(url).json().get("city")
-        all_data["X-Real-City"]= encryptor.encryptCrutial(city)
+        all_data["X-Real-City"]= city
         
         with open(path, "w") as fp:
             json.dump(all_data, fp, indent=2)
