@@ -50,7 +50,7 @@ class MailTransmit():
 		message["subject"] = subject
 
 		alt=MIMEMultipart("alternative")
-		alt.attach(MIMEText(self._buildHTML(link, message_text, to), "html"))
+		alt.attach(MIMEText(self._buildHTML(link, message_text), "html"))
 		message.attach(alt)
 
 		if (attachment):

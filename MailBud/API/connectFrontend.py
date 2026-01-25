@@ -1,28 +1,26 @@
-from flask import Flask, request, json
+from flask import Flask, request, json, session
 from typing import Any
-import base64, time, os
+import base64, os, time
 import mimetypes
-from MailBud.utils import databaseConnect as dc
+from MailBud.utils.databaseConnect import DatabaseFetch as dc
+from MailBud.utils.databaseConnect import DatabaseInsert as di
 from MailBud.mailTransmit import MailTransmit
 from MailBud.utils.iterEmails import iterEmail
 import dotenv
 
 dotenv.load_dotenv("src/certs/credential.env")
 
-app=Flask(__name__)
 
 class Config:
     def __init__(self):
+        self.app=Flask(__name__)
+        self.app.secret_key=os.getenv("FLASK_SECRET_KEY")
         self.tunnel_url: str = os.getenv("TUNNEL")
-        app.add_url_rule("/getdata", view_func=self.getData, methods=["POST", "GET"])
-        app.add_url_rule("/sendfile", view_func=self.getFile, methods=["POST", "GET"])
-        app.add_url_rule("/sendname", view_func=self.getName, methods=["POST"])
-        app.add_url_rule("/sendmail", view_func=self.sendMail, methods=["GET"])
-    
-    def getData(self) -> dict[str, Any]:
-        data = request.get_json()
-        return data
-    
+        self.app.add_url_rule("/sendfile", view_func=self.getFile, methods=["POST", "GET"])
+        self.app.add_url_rule("/sendname", view_func=self.getName, methods=["POST"])
+        self.app.add_url_rule("/getname", view_func=self.getName, methods=["POST"])
+        self.app.add_url_rule("/sendmail", view_func=self.sendMail, methods=["POST", "GET"])
+  
     def getFile(self) -> dict[str, Any]:
         files = request.files.getlist('file')
         for file in files:
@@ -43,45 +41,38 @@ class Config:
                     'data': encoded_data,
                     'mime_type': mime_type
                 }
-                with open("attach.json", "w") as fp:
+                with open("MailBud/transit/attach.json", "w") as fp:
                     json.dump(attachment, fp)
                 return attachment
             else:
 
-                file.save("emails.csv")
+                file.save("MailBud/transit/emails.csv")
 
     def getName(self) -> dict:
         data = request.get_json()
-        user: str=data.get("name").strip()
-        with open("MailBud/transit/user.txt", "w") as fp:
-            fp.write(user)
-        response={"isUser": dc.DatabaseFetch().isUser(user)}
+        rawUser=data.get("name").strip().split(" ")
+        user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
+        response={"isUser": dc().isUser(user)}
         return response
     
     def sendMail(self):
-        mailData=self.getData()
-        print(mailData)
-        with open("MailBud/transit/user.txt", "r") as fp:
-            rt=dc.DatabaseFetch().fetchRTData(fp.read())
-            mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
-            try:
-                with open("MailBud/transit/sendData.json", "r") as mailData:
-                    with open("MailBud/transit/attach.json", "r") as fileData:
-                        sendData: dict=json.load(mailData)
-                        fileAttach: dict=json.load(fileData)
-                        for email in iterEmail():
-                            mail.sendMessage(sender=dc.DatabaseFetch().fetchEmailData(fp.read()), to=email,
-                                            subject=sendData.get("subject"),
-                                            message_text=sendData.get("message"),
-                                            link=sendData.get("link"), attachment=fileAttach)
-                            dc.DatabaseInsert().insertEmailData(email, sendData.get("subject"), str(time.strftime("%Y:%m:%d %H:%M:%S")))
-                        dc.DatabaseInsert().insertPRJData(sendData.get("project"))
-            except Exception as e:
-                print(f"Error: {e}")
-
-        os.remove("MailBud/transit/sendData.json")
-        os.remove("MailBud/transit/user.txt")
+        mailData=request.get_json()
+        rawUser=mailData.get("name").strip().split(" ")
+        user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
+        rt=dc().fetchRTData(user)
+        sendr=dc().fetchEmailData(user)
+        mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
+        try:
+            with open("MailBud/transit/attach.json", "r") as fileData:
+                fileAttach: dict=json.load(fileData)
+                for email in iterEmail():
+                    mail.sendMessage(sender=sendr, to=email, subject=mailData.get("subject"),message_text=mailData.get("message"),link=mailData.get("link"), attachment=fileAttach)
+                    di().insertEmailData(email, mailData.get("subject"), str(time.strftime("%Y:%m:%d %H:%M:%S")))
+                di().insertPRJData(mailData.get("project"))
+        except Exception as e:
+            print(f"Error: {e}")
         return {"msg": "Mail Sent Successfully!"}
     
 if __name__=="__main__":
-    app.run(debug=True, port=5005)
+    instance=Config()
+    instance.app.run(debug=True, port=5005)

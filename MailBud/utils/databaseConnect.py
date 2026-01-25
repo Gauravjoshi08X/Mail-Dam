@@ -26,7 +26,7 @@ class DatabaseInsert():
 				VALUES (
 					%s,%s
 				);"""
-				cur.execute(event_query, (project, self.fetchpk.fetchFKData("user_id", "users")))
+				cur.execute(event_query, (project, DatabaseFKFetch().fetchFKData("user_id", "users")))
 				conn.commit()
 
 	def insertOpenEventData(self, event_time: str) -> None:
@@ -36,7 +36,7 @@ class DatabaseInsert():
 				VALUES (
 					%s,%s,%s
 				);"""
-				cur.execute(event_query, (self.fetchpk.fetchFKData("email_id", "email"), self.fetchpk.fetchFKData("project_id", "project"), event_time, True))
+				cur.execute(event_query, (DatabaseFKFetch().fetchFKData("email_id", "email"), DatabaseFKFetch().fetchFKData("project_id", "project"), event_time, True))
 				conn.commit()
 
 	def insertEventData(self, location: str) -> None:
@@ -51,14 +51,14 @@ class DatabaseInsert():
 	def insertEmailData(self, recipient: str, subject: str, sent_at: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
-				event_query="""INSERT INTO email (project_id, recipient, subject, sent_at)
+				event_query="""INSERT INTO email (project_id, recipient_email, subject, sent_at)
 				VALUES (
 					%s,%s,%s,%s
 				);"""
-				cur.execute(event_query, (self.fetchpk.fetchFKData("project_id", "project"), recipient, subject, sent_at))
+				cur.execute(event_query, (DatabaseFKFetch().fetchFKData("project_id", "project"), recipient, subject, sent_at))
 				conn.commit()
 
-class DatabasePKFetch():
+class DatabaseFKFetch():
 	def __init__(self):
 		self.name=os.getenv("DBNAME")
 		self.user=os.getenv("DBUSER")
@@ -67,8 +67,8 @@ class DatabasePKFetch():
 	def fetchFKData(self,id, table) -> int:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
-				event_query="""SELECT MAX({id}) FROM {table}"""
-				cur.execute(event_query, (id, table))
+				event_query=f"""SELECT MAX({id}) FROM {table};"""
+				cur.execute(event_query)
 				result=cur.fetchone()
 				return result[0]
 
@@ -96,7 +96,7 @@ class DatabaseFetch():
 				result=cur.fetchone()
 				return result[0]
 
-	def fetchEmailData(self,user) -> str:
+	def fetchEmailData(self,user: str) -> str:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""SELECT email from users where uname=%s"""

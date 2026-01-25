@@ -1,7 +1,7 @@
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:developer' as dev;
+import 'dart:developer';
 import 'global_function.dart' as fn;
 
 Future<void> openAuth() async {
@@ -14,6 +14,18 @@ Future<void> openAuth() async {
     mode: LaunchMode.externalApplication,
   );
 }
+
+Future<void> getName(String name) async
+{
+  try{
+    final url=Uri.parse("https://9xkmd6fc-5005.inc1.devtunnels.ms/getname");
+    await http.post(url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({"name": name}));
+  }
+  catch(e){
+    log(e.toString());
+    }}
 
 Future<bool> sendName(String name) async
 {
@@ -30,19 +42,19 @@ Future<bool> sendName(String name) async
       return false;
     }
   } catch (e){
-    dev.log(e.toString());
+    log(e.toString());
     return  false;
   }
 }
 
-Future<void> sendData({String? project, String? subject, String? message, String? link}) async {
+Future<void> sendData({String? name, String? project, String? subject, String? message, String? link}) async {
   try {
-    var url = Uri.parse('https://9xkmd6fc-5005.inc1.devtunnels.ms/getdata');
+    var url = Uri.parse('https://9xkmd6fc-5005.inc1.devtunnels.ms/sendmail');
     await http.post(url, 
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({"project": project, "subject": subject, "message": message, "link": link}));
+      body: jsonEncode({"name":name, "project": project, "subject": subject, "message": message, "link": link}));
   } catch (e) {
-    dev.log('Error sending data: $e');
+    log('Error sending data: $e');
     rethrow;
   }
 }
@@ -54,10 +66,10 @@ Future<void> sendFiles() async {
   request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.imgPath));
   var response=await request.send();
   if (response.statusCode==200){
-    dev.log("Success");
+    log("Success");
   }}
   catch(e){
-    dev.log(e.toString());
+    log(e.toString());
   }
   }
 
@@ -69,6 +81,6 @@ Future<void> sendMail() async {
   await http.get(uri, headers: {"content-type": "application/json"});
   }
   catch (e){
-    dev.log(e.toString());
+    log(e.toString());
   }
 }
