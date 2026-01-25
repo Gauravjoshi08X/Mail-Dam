@@ -29,23 +29,23 @@ class DatabaseInsert():
 				cur.execute(event_query, (project, DatabaseFKFetch().fetchUserFKData(user)))
 				conn.commit()
 
-	def insertOpenEventData(self, event_time: str) -> None:
+	def insertOpenEventData(self, event_time: str, email: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""INSERT INTO event (email_id, project_id, event_time, open)
 				VALUES (
 					%s,%s,%s,%s
 				);"""
-				cur.execute(event_query, (DatabaseFKFetch().fetchFKData("email_id", "email"), DatabaseFKFetch().fetchFKData("project_id", "project"), event_time, True))
+				cur.execute(event_query, (DatabaseFKFetch().fetchUserEventData(email), DatabaseFKFetch().fetchFKData("project_id", "project"), event_time, True))
 				conn.commit()
 
-	def insertEventData(self, location: str) -> None:
+	def insertEventData(self, location: str, email: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""UPDATE event
 				set click=%s, location=%s
 				WHERE email_id=%s;"""
-				cur.execute(event_query, (True, location, DatabaseFKFetch().fetchFKData("email_id", "email")))
+				cur.execute(event_query, (True, location, DatabaseFKFetch().fetchUserEventData(email)))
 				conn.commit()
 
 	def insertEmailData(self, recipient: str, subject: str, sent_at: str) -> None:
@@ -77,6 +77,14 @@ class DatabaseFKFetch():
 			with conn.cursor() as cur:
 				event_query="""SELECT user_id FROM users where uname=%s;"""
 				cur.execute(event_query, (uname,))
+				result=cur.fetchone()
+				return result[0]
+
+	def fetchUserEventData(self, email: str)->int:
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
+			with conn.cursor() as cur:
+				event_query="""SELECT email_id FROM email where recipient_email=%s;"""
+				cur.execute(event_query, (email,))
 				result=cur.fetchone()
 				return result[0]
 
@@ -116,18 +124,23 @@ class DatabaseFetch():
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""
-		SELECT COUNT(DISTINCT open) FILTER (WHERE open = true) AS unique_opens,
-		COUNT(DISTINCT click) FILTER (WHERE click = true) AS unique_clicks
-		FROM event
-		WHERE project_id = (
-		SELECT max(project_id)
-		FROM project
-		WHERE user_id = (
-			SELECT user_id FROM users WHERE uname = %s
-		)
-		);
+			SELECT
+				SUM(open_count) AS total_opens,
+				SUM(click_count) AS total_clicks
+			FROM (
+				SELECT 
+					email_id,
+					MAX(open::int) AS open_count,
+					MAX(click::int) AS click_count
+				FROM event
+				WHERE email_id IS NOT NULL
+				GROUP BY email_id
+			) AS per_user;
 				"""
 				cur.execute(event_query, (user,))
 				result=cur.fetchall()
 				return result
+opened, clicked=DatabaseFetch().fetchStat("Gaurav Joshi")[0]
 
+if __name__=="__main__":
+	print(f"Email opened by {opened} and link visited by {clicked}")

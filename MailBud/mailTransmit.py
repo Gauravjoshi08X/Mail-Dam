@@ -27,16 +27,16 @@ class MailTransmit():
 		return build("gmail", "v1", credentials=creds)
 
 	# function to build html template for different version of link
-	def _buildHTML(self, link: str|None, message_text: str) -> str:
+	def _buildHTML(self, link: str|None, message_text: str, to: str) -> str:
 		linkHTML=""
 		if link:
-			linkHTML=f"""<a href="{self.serverLink}/click/redirect?url={link}">{link}</a>"""
+			linkHTML=f"""<a href="{self.serverLink}/click/{to}/redirect?url={link}">{link}</a>"""
 		# Embed tracking pixel
 		htmlContent = f"""
 			<html>
 				<body>
 				<p>{message_text}</p>
-				<img src="{self.serverLink}/static" width="1" height="1"/>
+				<img src="{self.serverLink}/static/{to}" width="1" height="1"/>
 				{linkHTML}
 				</body>
 			</html>
@@ -50,7 +50,7 @@ class MailTransmit():
 		message["subject"] = subject
 
 		alt=MIMEMultipart("alternative")
-		alt.attach(MIMEText(self._buildHTML(link, message_text), "html"))
+		alt.attach(MIMEText(self._buildHTML(link, message_text, to), "html"))
 		message.attach(alt)
 
 		if (attachment):
