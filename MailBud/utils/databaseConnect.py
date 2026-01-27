@@ -8,7 +8,7 @@ class DatabaseInsert():
 		self.name=os.getenv("DBNAME")
 		self.user=os.getenv("DBUSER")
 		self.password=os.getenv("DBPASSWORD")
-	@staticmethod
+
 	def insertUserData(self, email: str, uname: str, refresh_token: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
@@ -18,7 +18,7 @@ class DatabaseInsert():
 				);"""
 				cur.execute(event_query, (email, uname, refresh_token))
 				conn.commit()
-				conn.clo
+
 
 	def insertPRJData(self, project: str, user: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:

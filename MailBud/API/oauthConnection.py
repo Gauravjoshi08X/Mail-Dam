@@ -55,7 +55,7 @@ class OauthConnection:
                 headers={"Authorization": f"Bearer {creds.token}"}
             ).json()
             
-            DatabaseInsert.insertUserData(userinfo['email'], userinfo['name'], creds.refresh_token)
+            DatabaseInsert().insertUserData(userinfo['email'], userinfo['name'], creds.refresh_token)
             
             return "OAuth completed"
         
