@@ -165,16 +165,16 @@ String? selectedCSV;
     )),
         // Explore
         SingleChildScrollView(
-        child: Column(
-        children: [reuseable.ReusableComponents().card(svg.email,"Email Views", "128/410", Color.fromRGBO(0, 141, 0, 0.763)),
-        reuseable.ReusableComponents().card(svg.link,"Link Clicks", "68/410", Color.fromRGBO(185, 0, 0, 0.811)),
-        reuseable.ReusableComponents().card(svg.star,"Email Pull", "Moderate", Color.fromRGBO(0,141,0,.763)),
-        reuseable.ReusableComponents().card(svg.bounce,"Bounce", "8/410", Color.fromRGBO(0,141,0,.763)),
-        reuseable.ReusableComponents().card(svg.location,"Location", "Lalitpur", Color.fromRGBO(224, 225, 231, 1)),
-        Image.asset("asset/images/chart.png")
+        child: Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: 15), child: Column(
+          spacing: 12,
+        children: [reuseable.ReusableComponents().card(svg.email,"Email Views", "128/410"),
+        reuseable.ReusableComponents().card(svg.link,"Link Clicks", "68/410"),
+        reuseable.ReusableComponents().card(svg.star,"Email Pull", "Moderate"),
+        reuseable.ReusableComponents().card(svg.bounce,"CTOR", "8/410"),
+        reuseable.ReusableComponents().card(svg.location,"Location", "Lalitpur")
       ])
     )
-    ][currentTabIndex]
+    )][currentTabIndex]
     );
   }
   }

@@ -56,7 +56,7 @@ class ReusableComponents {
     ]));
   }
 
-  Widget card(String iconCode, String primaryText, String secondaryText, Color colorCode){
+  Widget card(String iconCode, String primaryText, String secondaryText, {Color colorCode=const Color.fromRGBO(224, 225, 231, 1)}){
     return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

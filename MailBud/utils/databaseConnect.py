@@ -119,18 +119,58 @@ class DatabaseFetch():
 				cur.execute(event_query, (user,))
 				result=cur.fetchone()
 				return result[0]
-
-	def fetchStat(self, user: str) -> list[tuple]:
+	
+	def totalEmails(self, user: str) -> int:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""
-			select count(distinct(email_id)) from event where open is true and project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
-			select count(distinct(email_id)) from event where click is true and project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
+			select count(*) from email where project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
 				"""
 				cur.execute(event_query, (user,))
-				result=cur.fetchall()
-				return result
+				result=cur.fetchone()
+				return result[0]
+
+	def fetchStat(self, user: str):
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
+			with conn.cursor() as cur:
+				open_query="""
+			select count(distinct(email_id)) from event where open is true and project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
+			"""
+				cur.execute(open_query, (user,))
+				open=cur.fetchone()
+				click_query="""
+				select count(distinct(email_id)) from event where click is true and project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
+					"""
+				cur.execute(click_query, (user,))
+				click=cur.fetchone()
+				return (open, click)
+
+	def location(self, user: str) -> str:
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
+			with conn.cursor() as cur:
+				location_query="""
+			select max(location) from event where project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
+			"""
+				cur.execute(location_query, (user,))
+				location=cur.fetchone()
+				return location[0]
+
+class Calculate():
+	def computeOpenRate(self, user: str) -> float:
+		opened, _=DatabaseFetch().fetchStat(user)
+		total=DatabaseFetch().totalEmails(user)
+		if total==0:
+			return 0.0
+		return f"{(opened[0]/total)*5:.2f}"
+
+	def CTOR(self, user: str) -> float:
+		opened, clicked=DatabaseFetch().fetchStat(user)
+		if opened==0:
+			return 0.0
+		return f"{(clicked[0]/opened[0])*100:.2f}"
+
 
 if __name__=="__main__":
-	opened, clicked=DatabaseFetch().fetchStat("Gaurav Joshi")[0]
-	print(f"Email opened by {opened} and link visited by {clicked}")
+	print(Calculate().computeOpenRate("Gaurav Joshi"))
+	print(Calculate().CTOR("Gaurav Joshi"))
+	print(DatabaseFetch().location("Gaurav Joshi"))
