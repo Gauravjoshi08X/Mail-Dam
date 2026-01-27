@@ -23,6 +23,7 @@ class Config:
   
     def getFile(self) -> dict[str, Any]:
         files = request.files.getlist('file')
+        attachment = {}
         for file in files:
             if (file.filename.split(".")[1]!="csv"):
                 file_content = file.read()
@@ -41,12 +42,17 @@ class Config:
                     'data': encoded_data,
                     'mime_type': mime_type
                 }
-                with open("MailBud/transit/attach.json", "w") as fp:
-                    json.dump(attachment, fp)
-                return attachment
             else:
+                content = file.read().decode("utf-8")
+                email=iterEmail(content)
+                if (attachment=={}):
+                    self.sendMail(email, None)
+                else:
+                    self.sendMail(email, attachment)
+        return {"msg": "Emails Sent Successfully!"}
 
-                file.save("MailBud/transit/emails.csv")
+
+
 
     def getName(self) -> dict:
         data = request.get_json()
@@ -54,8 +60,8 @@ class Config:
         user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
         response={"isUser": dc().isUser(user)}
         return response
-    
-    def sendMail(self):
+
+    def sendMail(self, email: str, fileAttach: dict|None) -> dict:
         mailData=request.get_json()
         rawUser=mailData.get("name").strip().split(" ")
         user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
@@ -64,11 +70,8 @@ class Config:
         mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
         try:
             di().insertPRJData(mailData.get("project"), user)
-            with open("MailBud/transit/attach.json", "r") as fileData:
-                fileAttach: dict=json.load(fileData)
-                for email in iterEmail():
-                    mail.sendMessage(sender=sendr, to=email, subject=mailData.get("subject"),message_text=mailData.get("message"),link=mailData.get("link"), attachment=fileAttach)
-                    di().insertEmailData(email, mailData.get("subject"), str(time.strftime("%Y:%m:%d %H:%M:%S")))
+            mail.sendMessage(sender=sendr, to=email, subject=mailData.get("subject"),message_text=mailData.get("message"),link=mailData.get("link"), attachment=fileAttach)
+            di().insertEmailData(email, mailData.get("subject"), str(time.strftime("%Y:%m:%d %H:%M:%S")))
         except Exception as e:
             print(f"Error: {e}")
         return {"msg": "Mail Sent Successfully!"}

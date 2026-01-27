@@ -28,7 +28,9 @@ class TrackingServer:
         opened_time=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
         dc.DatabaseInsert().insertOpenEventData(opened_time, emailID)
         if destination:
-            dc.DatabaseInsert().insertEventData("Kathmandu", emailID)
+            city=trackIP()
+            print(city)
+            dc.DatabaseInsert().insertEventData(city, emailID)
             
 
 
