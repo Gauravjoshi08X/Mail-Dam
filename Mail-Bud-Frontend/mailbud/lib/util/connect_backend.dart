@@ -47,10 +47,10 @@ Future<bool> sendName(String name) async
   }
 }
 
-Future<void> sendMail(String name, String project, String subject, String message, String link) async {
+Future<void> sendMail(String flag, String name, String project, String subject, String message, String link) async {
   var request=http.MultipartRequest("POST", Uri.parse("https://9xkmd6fc-5005.inc1.devtunnels.ms/sendmail"));
   try{
-
+    request.fields['flag']=flag;
     request.fields['name']=name;
     request.fields['project']=project;
     request.fields['subject']=subject;

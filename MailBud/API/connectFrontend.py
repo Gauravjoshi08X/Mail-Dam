@@ -29,12 +29,17 @@ class Config:
         return response
 
     def sendMail(self) -> dict[str, Any]:
+        flag = request.form.get("flag")
         project = request.form.get("project")
         subject = request.form.get("subject")
-        message = request.form.get("message")
+        message = request.form.get("message").replace("\n", "<br>")
         link = request.form.get("link")
         name = request.form.get("name").strip().split(" ")
         formatted_name=" ".join([name[0].capitalize(), name[1].capitalize()])
+        
+        rt=dc().fetchRTData(formatted_name)
+        sendr=dc().fetchEmailData(formatted_name)
+        mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
         files = request.files.getlist('file')
         attachment = {}
         for file in files:
@@ -55,23 +60,27 @@ class Config:
                     'data': encoded_data,
                     'mime_type': mime_type
                 }
+            
             else:
-                rt=dc().fetchRTData(formatted_name)
-                sendr=dc().fetchEmailData(formatted_name)
-                mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
                 content = file.read().decode("utf-8")
                 emails=iterEmail(content)
                 if (attachment=={}):
+                    if (flag=="test"):
+                        mail.sendMessage(sendr, sendr, subject, message, link)
+                        return jsonify({"msg": "Emails Sent Successfully!"})
+                    di().insertPRJData(project, formatted_name)
                     for email in emails:
-                        di().insertPRJData(project, formatted_name)
                         mail.sendMessage(sendr, email, subject, message, link)
-                        di().insertEmailData(email, formatted_name, datetime.datetime.now())
+                        di().insertEmailData(email, subject, datetime.datetime.now())
                 else:
+                    if (flag=="test"):
+                        mail.sendMessage(sendr, sendr, subject, message, link, attachment)
+                        return jsonify({"msg": "Emails Sent Successfully!"})
+                    di().insertPRJData(project, formatted_name)
                     for email in emails:
-                        di().insertPRJData(project, formatted_name)
                         mail.sendMessage(sendr, email, subject, message, link, attachment)
-                        di().insertEmailData(email, formatted_name, datetime.datetime.now())
-
+                        di().insertEmailData(email, subject, datetime.datetime.now())
+            
         return jsonify({"msg": "Emails Sent Successfully!"})
 
 if __name__=="__main__":

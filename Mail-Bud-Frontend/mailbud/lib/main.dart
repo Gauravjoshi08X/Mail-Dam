@@ -155,10 +155,10 @@ String? selectedCSV;
         child: Row(
           spacing: MediaQuery.of(context).size.width*.2,
           children: [
-          reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () async{await connect_backend.sendMail(nameControl.text, projectControl.text, subjectControl.text, messageControl.text, linkControl.text);}),
+          reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () async{await connect_backend.sendMail("test", nameControl.text, projectControl.text, subjectControl.text, messageControl.text, linkControl.text);}),
           reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255),
           () async {
-                await connect_backend.sendMail(nameControl.text, projectControl.text, subjectControl.text, messageControl.text, linkControl.text);
+                await connect_backend.sendMail("send", nameControl.text, projectControl.text, subjectControl.text, messageControl.text, linkControl.text);
           }),
         ])), 
       ])

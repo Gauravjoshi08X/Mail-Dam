@@ -62,8 +62,9 @@ class TrackingServer:
         destination = request.args.get("url") # gets args redirect?url="example.com"
         self._trackClickHelper(emailID, destination)
         # Redirect user to their intended destination
-        if (not destination.startswith(("http://www.", "https://www."))):
-            return redirect(f"https://www.{destination}")
+        if not destination.startswith("https://"):
+            destination=f"https://{destination}"
+        return redirect(f"{destination}")
 
 if __name__ == '__main__':
     server=TrackingServer()
