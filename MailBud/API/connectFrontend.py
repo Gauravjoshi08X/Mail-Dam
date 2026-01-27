@@ -19,10 +19,26 @@ class Config:
         self.tunnel_url: str = os.getenv("MAIL_TUNNEL")
         self.app.add_url_rule("/sendmail", view_func=self.sendMail, methods=["POST", "GET"])
         self.app.add_url_rule("/sendname", view_func=self.getName, methods=["POST"])
+        self.app.add_url_rule("/getstat", view_func=self.getStat, methods=["POST","GET"])
+        self.app.add_url_rule("/getemail", view_func=self.getEmail, methods=["POST","GET"])
         self.app.add_url_rule("/getname", view_func=self.getName, methods=["POST"])
-  
+    
+    def getStat(self)->Response:
+        user=request.get_json().get("name")
+        rawUser=user.strip().split(" ")
+        user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
+        response=jsonify(dc().sendStat(user))
+        return response
+
+    def getEmail(self)->Response:
+        user=request.get_json().get("name")
+        rawUser=user.strip().split(" ")
+        user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
+        response=jsonify({"email":dc().getEmails(user)})
+        return response
+
     def getName(self) -> dict:
-        data = request.get_json()
+        data = request.get_json()['name']
         rawUser=data.strip().split(" ")
         user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
         response={"isUser": dc().isUser(user)}

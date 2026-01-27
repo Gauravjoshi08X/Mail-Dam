@@ -18,6 +18,7 @@ class DatabaseInsert():
 				);"""
 				cur.execute(event_query, (email, uname, refresh_token))
 				conn.commit()
+				conn.clo
 
 	def insertPRJData(self, project: str, user: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
@@ -154,6 +155,27 @@ class DatabaseFetch():
 				cur.execute(location_query, (user,))
 				location=cur.fetchone()
 				return location[0]
+	
+	def getEmails(self, user: str) -> list:
+		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
+			with conn.cursor() as cur:
+				email_query="""
+			select recipient_email from email where project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
+			"""
+				cur.execute(email_query, (user,))
+				emails=cur.fetchall()
+				return [email[0] for email in emails]
+
+	def sendStat(self, user: str)-> dict:
+		payload={
+			"opened": f"{DatabaseFetch().fetchStat(user)[0][0]}/{DatabaseFetch().totalEmails(user)}",
+			"clicked": f"{DatabaseFetch().fetchStat(user)[1][0]}/{DatabaseFetch().totalEmails(user)}",
+			"rating": f"{Calculate().computeOpenRate(user)}",
+			"ctor": f"{Calculate().CTOR(user)}%",
+			"location": f"{DatabaseFetch().location(user) if DatabaseFetch().location(user) else 'No Clicks Yet'}"
+		}
+		return payload
+
 
 class Calculate():
 	def computeOpenRate(self, user: str) -> float:
@@ -165,12 +187,12 @@ class Calculate():
 
 	def CTOR(self, user: str) -> float:
 		opened, clicked=DatabaseFetch().fetchStat(user)
-		if opened==0:
+		if opened[0]==0:
 			return 0.0
 		return f"{(clicked[0]/opened[0])*100:.2f}"
 
-
 if __name__=="__main__":
-	print(Calculate().computeOpenRate("Gaurav Joshi"))
-	print(Calculate().CTOR("Gaurav Joshi"))
-	print(DatabaseFetch().location("Gaurav Joshi"))
+	print(DatabaseFetch().sendStat("Gaurav Joshi"))
+	print(DatabaseFetch().getEmails("Gaurav Joshi"))
+	opened, clicked=DatabaseFetch().fetchStat("Gaurav Joshi")
+	print(opened[0])

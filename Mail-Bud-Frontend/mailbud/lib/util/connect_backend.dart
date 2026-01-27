@@ -26,6 +26,30 @@ Future<void> getName(String name) async
   catch(e){
     log(e.toString());
     }}
+  
+Future<Map> getStat(String name) async
+{
+  try{
+    final url=Uri.parse("https://9xkmd6fc-5005.inc1.devtunnels.ms/getstat");
+    final response=await http.post(url, headers: {"Content-Type": "application/json"}, body: jsonEncode({"name": name}));
+    return jsonDecode(response.body);
+  }
+  catch(e){
+    log(e.toString());
+    return {"Error": e};
+    }}
+
+Future<Map> getEmails(String name) async
+{
+  try{
+    final url=Uri.parse("https://9xkmd6fc-5005.inc1.devtunnels.ms/getemail");
+    final response=await http.post(url, headers: {"Content-Type": "application/json"}, body: jsonEncode({"name": name}));
+    return jsonDecode(response.body);
+  }
+  catch(e){
+    log(e.toString());
+    return {"Error": e};
+    }}
 
 Future<bool> sendName(String name) async
 {
