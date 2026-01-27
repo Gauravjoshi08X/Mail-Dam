@@ -29,7 +29,7 @@ class DatabaseInsert():
 				cur.execute(event_query, (project, DatabaseFKFetch().fetchUserFKData(user)))
 				conn.commit()
 
-	def insertOpenEventData(self, event_time: str, email: str) -> None:
+	def insertOpenEventData(self, event_time, email: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""INSERT INTO event (email_id, project_id, event_time, open)
@@ -48,7 +48,7 @@ class DatabaseInsert():
 				cur.execute(event_query, (True, location, DatabaseFKFetch().fetchUserEventData(email)))
 				conn.commit()
 
-	def insertEmailData(self, recipient: str, subject: str, sent_at: str) -> None:
+	def insertEmailData(self, recipient: str, subject: str, sent_at) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""INSERT INTO email (project_id, recipient_email, subject, sent_at)
@@ -114,7 +114,7 @@ class DatabaseFetch():
 
 	def fetchEmailData(self,user: str) -> str:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
-			with conn.cursor() as cur:
+			with conn.cursor() as cur: 
 				event_query="""SELECT email from users where uname=%s"""
 				cur.execute(event_query, (user,))
 				result=cur.fetchone()
@@ -124,23 +124,13 @@ class DatabaseFetch():
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				event_query="""
-			SELECT
-				SUM(open_count) AS total_opens,
-				SUM(click_count) AS total_clicks
-			FROM (
-				SELECT 
-					email_id,
-					MAX(open::int) AS open_count,
-					MAX(click::int) AS click_count
-				FROM event
-				WHERE email_id IS NOT NULL
-				GROUP BY email_id
-			) AS per_user;
+			select count(distinct(email_id)) from event where open is true and project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
+			select count(distinct(email_id)) from event where click is true and project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
 				"""
 				cur.execute(event_query, (user,))
 				result=cur.fetchall()
 				return result
-opened, clicked=DatabaseFetch().fetchStat("Gaurav Joshi")[0]
 
 if __name__=="__main__":
+	opened, clicked=DatabaseFetch().fetchStat("Gaurav Joshi")[0]
 	print(f"Email opened by {opened} and link visited by {clicked}")

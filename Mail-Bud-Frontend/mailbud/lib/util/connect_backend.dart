@@ -47,24 +47,24 @@ Future<bool> sendName(String name) async
   }
 }
 
-Future<void> sendData({String? name, String? project, String? subject, String? message, String? link}) async {
-  try {
-    var url = Uri.parse('https://9xkmd6fc-5005.inc1.devtunnels.ms/sendmail');
-    await http.post(url, 
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({"name":name, "project": project, "subject": subject, "message": message, "link": link}));
-  } catch (e) {
-    log('Error sending data: $e');
-    rethrow;
-  }
-}
-
-Future<void> sendFiles() async {
-  var request=http.MultipartRequest("POST", Uri.parse("https://9xkmd6fc-5005.inc1.devtunnels.ms/sendfile"));
+Future<void> sendMail(String name, String project, String subject, String message, String link) async {
+  var request=http.MultipartRequest("POST", Uri.parse("https://9xkmd6fc-5005.inc1.devtunnels.ms/sendmail"));
   try{
-  request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.csvPath));
-  request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.imgPath));
+
+    request.fields['name']=name;
+    request.fields['project']=project;
+    request.fields['subject']=subject;
+    request.fields['message']=message;
+    request.fields['link']=link;
+  if (fn.GlobalFunction.csvPath!=""){
+    request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.csvPath));
+  }
+  if (fn.GlobalFunction.imgPath!=""){
+    request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.imgPath));
+  }
   var response=await request.send();
+  await response.stream.bytesToString();
+
   if (response.statusCode==200){
     log("Success");
   }}
@@ -72,15 +72,3 @@ Future<void> sendFiles() async {
     log(e.toString());
   }
   }
-
-Future<void> sendMail() async {
-  try{
-  final uri= Uri.parse(
-    "https://9xkmd6fc-5005.inc1.devtunnels.ms/sendmail"
-  );
-  await http.get(uri, headers: {"content-type": "application/json"});
-  }
-  catch (e){
-    log(e.toString());
-  }
-}

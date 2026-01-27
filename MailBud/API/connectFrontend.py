@@ -1,6 +1,7 @@
-from flask import Flask, request, json, session
+import email
+from flask import Flask, Response, request, json, jsonify
 from typing import Any
-import base64, os, time
+import base64, os, datetime
 import mimetypes
 from MailBud.utils.databaseConnect import DatabaseFetch as dc
 from MailBud.utils.databaseConnect import DatabaseInsert as di
@@ -16,12 +17,24 @@ class Config:
         self.app=Flask(__name__)
         self.app.secret_key=os.getenv("FLASK_SECRET_KEY")
         self.tunnel_url: str = os.getenv("MAIL_TUNNEL")
-        self.app.add_url_rule("/sendfile", view_func=self.getFile, methods=["POST", "GET"])
+        self.app.add_url_rule("/sendmail", view_func=self.sendMail, methods=["POST", "GET"])
         self.app.add_url_rule("/sendname", view_func=self.getName, methods=["POST"])
         self.app.add_url_rule("/getname", view_func=self.getName, methods=["POST"])
-        self.app.add_url_rule("/sendmail", view_func=self.sendMail, methods=["POST", "GET"])
   
-    def getFile(self) -> dict[str, Any]:
+    def getName(self) -> dict:
+        data = request.get_json()
+        rawUser=data.strip().split(" ")
+        user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
+        response={"isUser": dc().isUser(user)}
+        return response
+
+    def sendMail(self) -> dict[str, Any]:
+        project = request.form.get("project")
+        subject = request.form.get("subject")
+        message = request.form.get("message")
+        link = request.form.get("link")
+        name = request.form.get("name").strip().split(" ")
+        formatted_name=" ".join([name[0].capitalize(), name[1].capitalize()])
         files = request.files.getlist('file')
         attachment = {}
         for file in files:
@@ -43,39 +56,24 @@ class Config:
                     'mime_type': mime_type
                 }
             else:
+                rt=dc().fetchRTData(formatted_name)
+                sendr=dc().fetchEmailData(formatted_name)
+                mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
                 content = file.read().decode("utf-8")
-                email=iterEmail(content)
+                emails=iterEmail(content)
                 if (attachment=={}):
-                    self.sendMail(email, None)
+                    for email in emails:
+                        di().insertPRJData(project, formatted_name)
+                        mail.sendMessage(sendr, email, subject, message, link)
+                        di().insertEmailData(email, formatted_name, datetime.datetime.now())
                 else:
-                    self.sendMail(email, attachment)
-        return {"msg": "Emails Sent Successfully!"}
+                    for email in emails:
+                        di().insertPRJData(project, formatted_name)
+                        mail.sendMessage(sendr, email, subject, message, link, attachment)
+                        di().insertEmailData(email, formatted_name, datetime.datetime.now())
 
+        return jsonify({"msg": "Emails Sent Successfully!"})
 
-
-
-    def getName(self) -> dict:
-        data = request.get_json()
-        rawUser=data.get("name").strip().split(" ")
-        user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
-        response={"isUser": dc().isUser(user)}
-        return response
-
-    def sendMail(self, email: str, fileAttach: dict|None) -> dict:
-        mailData=request.get_json()
-        rawUser=mailData.get("name").strip().split(" ")
-        user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
-        rt=dc().fetchRTData(user)
-        sendr=dc().fetchEmailData(user)
-        mail=MailTransmit(self.tunnel_url, "src/certs/g_cred.json", rt)
-        try:
-            di().insertPRJData(mailData.get("project"), user)
-            mail.sendMessage(sender=sendr, to=email, subject=mailData.get("subject"),message_text=mailData.get("message"),link=mailData.get("link"), attachment=fileAttach)
-            di().insertEmailData(email, mailData.get("subject"), str(time.strftime("%Y:%m:%d %H:%M:%S")))
-        except Exception as e:
-            print(f"Error: {e}")
-        return {"msg": "Mail Sent Successfully!"}
-    
 if __name__=="__main__":
     instance=Config()
     instance.app.run(debug=True, port=5005)

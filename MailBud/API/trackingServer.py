@@ -1,12 +1,11 @@
 from flask import Flask, request, redirect, Response
 from MailBud.utils.encryption import Encryptor
-import flask as fk, json
-import time, os
+import flask as fk
+import datetime, os
 import MailBud.utils.databaseConnect as dc
 
 # Custom modules
 from MailBud.utils.locateIP import trackIP
-import MailBud.utils.maiLanding as maiLanding
 
 class TrackingServer:
     # Global Variables
@@ -25,14 +24,12 @@ class TrackingServer:
         return full_URL
 
     def _logEvents(self, emailID: str, destination: str="")->None:
-        opened_time=time.strftime("%Y-%m-%d-%I:%M:%S %p %Z")
+        opened_time=datetime.datetime.now()
         dc.DatabaseInsert().insertOpenEventData(opened_time, emailID)
         if destination:
             city=trackIP()
             print(city)
             dc.DatabaseInsert().insertEventData(city, emailID)
-            
-
 
     # With no link
     '''

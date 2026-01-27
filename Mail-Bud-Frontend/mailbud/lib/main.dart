@@ -91,25 +91,25 @@ String? selectedCSV;
           NavigationDestination(icon: Icon(Icons.analytics_outlined), label: "Explore")
         ],
       ),
-      drawer: Drawer(
-        backgroundColor: Color.fromRGBO(15, 15, 15, 1),
-        child: ListView(
-          padding: EdgeInsets.only(top: 60),
-          children: <Widget>[
-            reuseable.ReusableComponents().exploreButtons(0, "Create project", Color.fromRGBO(224, 225, 231, 1), connect_backend.sendData),
-            Padding(padding: EdgeInsetsGeometry.only(top: 20, left: 20, bottom: 0) ,child: Text("Recent", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400))),
-            ListTile(
-              title: const Text('Promotion of new course', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),),
-            ),
-            ListTile(
-              title: const Text('Brand Affiliation with NTK', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),),
-            ),
-            ListTile(
-              title: const Text('Community partner promotion with RAN', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, overflow: TextOverflow.ellipsis),),
-            ),
-          ],
-        ),
-      ),
+      // drawer: Drawer(
+      //   backgroundColor: Color.fromRGBO(15, 15, 15, 1),
+      //   child: ListView(
+      //     padding: EdgeInsets.only(top: 60),
+      //     children: <Widget>[
+      //       reuseable.ReusableComponents().exploreButtons(0, "Create project", Color.fromRGBO(224, 225, 231, 1), connect_backend.sendData),
+      //       Padding(padding: EdgeInsetsGeometry.only(top: 20, left: 20, bottom: 0) ,child: Text("Recent", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400))),
+      //       ListTile(
+      //         title: const Text('Promotion of new course', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),),
+      //       ),
+      //       ListTile(
+      //         title: const Text('Brand Affiliation with NTK', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),),
+      //       ),
+      //       ListTile(
+      //         title: const Text('Community partner promotion with RAN', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, overflow: TextOverflow.ellipsis),),
+      //       ),
+      //     ],
+      //   ),
+      // ),
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(10, 10, 10, .5),
         title: Text(widget.title, textAlign: TextAlign.center)
@@ -155,13 +155,10 @@ String? selectedCSV;
         child: Row(
           spacing: MediaQuery.of(context).size.width*.2,
           children: [
-          reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () => connect_backend.sendData(message: messageControl.text, subject: subjectControl.text, link: linkControl.text)),
+          reuseable.ReusableComponents().exploreButtons(120, "Test email", Color.from(alpha: 1, red: 0, green: 155, blue: 0), () async{await connect_backend.sendMail(nameControl.text, projectControl.text, subjectControl.text, messageControl.text, linkControl.text);}),
           reuseable.ReusableComponents().exploreButtons(120, "Send email",Color.fromARGB(255, 133, 133, 255),
           () async {
-                await connect_backend.sendFiles();
-                await connect_backend.sendData(name: nameControl.text, project: projectControl.text, subject: subjectControl.text,
-                  message: messageControl.text, link: linkControl.text);
-                await connect_backend.sendMail();
+                await connect_backend.sendMail(nameControl.text, projectControl.text, subjectControl.text, messageControl.text, linkControl.text);
           }),
         ])), 
       ])
