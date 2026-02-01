@@ -2,7 +2,6 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue)](https://www.python.org/)
 [![Flutter](https://img.shields.io/badge/Flutter-3.32-blue)](https://flutter.dev/)
-[![Firebase](https://img.shields.io/badge/Firebase-RealtimeDB-orange)](https://firebase.google.com/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 ---
@@ -27,30 +26,19 @@ This project aims to provide an affordable, efficient, and user-friendly platfor
 ## Features
 
 - User authentication and profile management  
-- Create and manage email/SMS campaigns  
-- Integrate with Twilio for SMS and SMTP providers for email  
+- Create and manage email/SMS campaigns
 - Track email opens and link clicks with a tracking pixel  
 - Realtime analytics dashboard  
-- Responsive Flutter frontend  
-- Modular and scalable Python backend  
+- Responsive Flutter frontend
+- Modular and scalable Python backend
 
 ---
 
 ## Tech Stack
 
-- **Backend:** Python (Flask / FastAPI), Google Gmail API, Twilio API  
+- **Backend:** Python Flask, Google Gmail API, Oauth2
 - **Frontend:** Flutter (Dart)  
-- **Database:** Firebase Realtime Database  
-- **Other:** HTML/CSS for email templates  
+- **Database:** Postgres Database  
+- **Other:** HTML/CSS for email templates
 
 ---
-
-## Installation
-
-### Backend
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/maildam.git
-cd maildam/backend
