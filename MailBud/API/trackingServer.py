@@ -28,7 +28,6 @@ class TrackingServer:
         dc.DatabaseInsert().insertOpenEventData(opened_time, emailID)
         if destination:
             city=trackIP()
-            print(city)
             dc.DatabaseInsert().insertEventData(city, emailID)
 
     # With no link
@@ -39,7 +38,6 @@ class TrackingServer:
 
     # TODO:  Fix duplicate entry
     def sendTracker(self, emailID) -> Response:
-        print(emailID)
         self._logEvents(emailID)
         response=fk.send_file(self._getTrackerURL(), mimetype="image/png")
         # kinda forcing agent to return these
@@ -66,6 +64,9 @@ class TrackingServer:
             destination=f"https://{destination}"
         return redirect(f"{destination}")
 
+tracking_server=TrackingServer()
+app=tracking_server.app
+
 if __name__ == '__main__':
     server=TrackingServer()
-    server.app.run(debug=True, port=5000)
+    server.app.run(debug=True, port=5010)

@@ -192,7 +192,7 @@ String ctor='';
 
       Row(
       children: [
-      reuseable.ReusableComponents().attachments("Insert Image", svg.png, 20, 150, 20,0.45,
+      reuseable.ReusableComponents().attachments("Insert Document", svg.png, 20, 150, 20,0.45,
         () async {final path= await global_fn.GlobalFunction().selectImage();
           setState(() {
           selectedImg=path;

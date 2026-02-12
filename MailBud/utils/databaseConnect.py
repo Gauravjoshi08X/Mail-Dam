@@ -12,12 +12,20 @@ class DatabaseInsert():
 	def insertUserData(self, email: str, uname: str, refresh_token: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
-				event_query="""INSERT INTO users (email, uname, refresh_token)
-				VALUES (
-					%s,%s,%s
-				);"""
-				cur.execute(event_query, (email, uname, refresh_token))
-				conn.commit()
+				check_query="""SELECT EXISTS(SELECT user_id from users where email=%s)"""
+				cur.execute(check_query, (email,))
+				if cur.fetchone()[0]==False:
+					event_query="""INSERT INTO users (email, uname, refresh_token)
+					VALUES (
+						%s,%s,%s
+					);"""
+					cur.execute(event_query, (email, uname, refresh_token))
+					conn.commit()
+				else:
+					print(f"it's coming here\n{refresh_token}\nended")
+					event_query="""UPDATE users set refresh_token=%s where email=%s"""
+					cur.execute(event_query, (refresh_token, email))
+					conn.commit()
 
 
 	def insertPRJData(self, project: str, user: str) -> None:
@@ -160,8 +168,19 @@ class DatabaseFetch():
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				email_query="""
-			select recipient_email from email where project_id=(select max(project_id) from project where user_id=(select user_id from users where uname=%s))
-			"""
+					SELECT DISTINCT e.recipient_email
+					FROM email e
+					INNER JOIN event ev ON ev.email_id = e.email_id
+					WHERE ev.click = true and ev.project_id=(
+						SELECT MAX(project_id)
+						FROM project
+						WHERE user_id = (
+							SELECT user_id
+							FROM users
+							WHERE uname = 'Gaurav Joshi'
+    ))
+
+				"""
 				cur.execute(email_query, (user,))
 				emails=cur.fetchall()
 				return [email[0] for email in emails]
@@ -192,7 +211,4 @@ class Calculate():
 		return f"{(clicked[0]/opened[0])*100:.2f}"
 
 if __name__=="__main__":
-	print(DatabaseFetch().sendStat("Gaurav Joshi"))
-	print(DatabaseFetch().getEmails("Gaurav Joshi"))
-	opened, clicked=DatabaseFetch().fetchStat("Gaurav Joshi")
-	print(opened[0])
+	...

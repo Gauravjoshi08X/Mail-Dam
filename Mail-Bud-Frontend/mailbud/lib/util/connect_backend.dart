@@ -58,6 +58,7 @@ Future<bool> sendName(String name) async
     final response=(await http.post(url,
     headers: {"Content-Type": "application/json"},
     body: jsonEncode({"name": name})));
+    log(response.statusCode.toString());
     final isUser=jsonDecode(response.body)["isUser"];
     if (isUser){
       return true;
@@ -80,18 +81,24 @@ Future<void> sendMail(String flag, String name, String project, String subject, 
     request.fields['subject']=subject;
     request.fields['message']=message;
     request.fields['link']=link;
-  if (fn.GlobalFunction.csvPath!=""){
-    request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.csvPath));
-  }
   if (fn.GlobalFunction.imgPath!=""){
     request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.imgPath));
+  }
+  if (fn.GlobalFunction.csvPath!=""){
+    request.files.add(await http.MultipartFile.fromPath('file', fn.GlobalFunction.csvPath));
   }
   var response=await request.send();
   await response.stream.bytesToString();
 
   if (response.statusCode==200){
     log("Success");
-  }}
+  }
+  if (response.statusCode==500){
+    http.post(Uri.parse("https://9xkmd6fc-5005.inc1.devtunnels.ms/refresh"), headers: {"content-type": "application/json"}, 
+    body: jsonEncode({"name": name}));
+    openAuth();
+  }
+  }
   catch(e){
     log(e.toString());
   }

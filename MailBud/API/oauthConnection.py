@@ -1,13 +1,12 @@
 from flask import Flask, redirect, request
 from google_auth_oauthlib.flow import Flow
 import requests
-import os
+import os, uuid
 from MailBud.utils.databaseConnect import DatabaseInsert
 
 class OauthConnection:
     def __init__(self):
         self.app = Flask(__name__)
-        self.app.secret_key = "your_secret_key"
 
         os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
@@ -54,7 +53,6 @@ class OauthConnection:
                 "https://www.googleapis.com/oauth2/v2/userinfo",
                 headers={"Authorization": f"Bearer {creds.token}"}
             ).json()
-            
             DatabaseInsert().insertUserData(userinfo['email'], userinfo['name'], creds.refresh_token)
             
             return "OAuth completed"

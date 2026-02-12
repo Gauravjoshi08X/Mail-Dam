@@ -1,4 +1,3 @@
-import email
 from flask import Flask, Response, request, json, jsonify
 from typing import Any
 import base64, os, datetime
@@ -39,6 +38,7 @@ class Config:
 
     def getName(self) -> dict:
         data = request.get_json()['name']
+        print(data)
         rawUser=data.strip().split(" ")
         user=" ".join([rawUser[0].capitalize(), rawUser[1].capitalize()])
         response={"isUser": dc().isUser(user)}
@@ -81,23 +81,22 @@ class Config:
                 content = file.read().decode("utf-8")
                 emails=iterEmail(content)
                 if (attachment=={}):
-                    if (flag=="test"):
-                        mail.sendMessage(sendr, sendr, subject, message, link)
-                        return jsonify({"msg": "Emails Sent Successfully!"})
-                    di().insertPRJData(project, formatted_name)
-                    for email in emails:
-                        mail.sendMessage(sendr, email, subject, message, link)
-                        di().insertEmailData(email, subject, datetime.datetime.now())
+                    if (flag=="send"):
+                        di().insertPRJData(project, formatted_name)
+                        for email in emails:
+                            mail.sendMessage(sendr, email, subject, message, link)
+                            di().insertEmailData(email, subject, datetime.datetime.now())
                 else:
-                    if (flag=="test"):
-                        mail.sendMessage(sendr, sendr, subject, message, link, attachment)
-                        return jsonify({"msg": "Emails Sent Successfully!"})
-                    di().insertPRJData(project, formatted_name)
-                    for email in emails:
-                        mail.sendMessage(sendr, email, subject, message, link, attachment)
-                        di().insertEmailData(email, subject, datetime.datetime.now())
-            
-        return jsonify({"msg": "Emails Sent Successfully!"})
+                    if (flag=="send"):
+                        di().insertPRJData(project, formatted_name)
+                        for email in emails:
+                            mail.sendMessage(sendr, email, subject, message, link, attachment)
+                            di().insertEmailData(email, subject, datetime.datetime.now())
+
+        if (attachment and flag=="test"):
+            mail.sendMessage(sendr, sendr, subject, message, link, attachment)
+        elif ((not attachment) and flag=="test"):
+                mail.sendMessage(sendr, sendr, subject, message, link)
 
 if __name__=="__main__":
     instance=Config()
