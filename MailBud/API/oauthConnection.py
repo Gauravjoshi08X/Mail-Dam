@@ -80,9 +80,9 @@ class OauthConnection:
             res=redis.from_url(self.REDIS_URL)
             res.set(name=self.session_id, value=user_id, ex=7*24*60*60)
             return (self.session_id, user_id)
-    
+    # Only runs ater sessionRedis is called. using async is better.
     def getSession(self)->str:
-        ...
+        return self.session_id
             
 if __name__ == "__main__":
     oauth_conn = OauthConnection()

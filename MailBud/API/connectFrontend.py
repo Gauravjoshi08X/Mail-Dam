@@ -14,7 +14,6 @@ dotenv.load_dotenv("src/certs/credential.env")
 class Config:
     def __init__(self):
         self.app=Flask(__name__)
-        self.app.secret_key=os.getenv("FLASK_SECRET_KEY")
         self.tunnel_url: str = os.getenv("MAIL_TUNNEL")
         self.app.add_url_rule("/sendmail", view_func=self.sendMail, methods=["POST", "GET"])
         self.app.add_url_rule("/sendname", view_func=self.getName, methods=["POST"])
