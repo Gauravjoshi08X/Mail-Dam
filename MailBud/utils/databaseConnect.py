@@ -9,20 +9,19 @@ class DatabaseInsert():
 		self.user=os.getenv("DBUSER")
 		self.password=os.getenv("DBPASSWORD")
 
-	def insertUserData(self, email: str, uname: str, refresh_token: str) -> None:
+	def insertUserData(self,uid, email: str, uname: str, refresh_token: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				check_query="""SELECT EXISTS(SELECT user_id from users where email=%s)"""
 				cur.execute(check_query, (email,))
 				if cur.fetchone()[0]==False:
-					event_query="""INSERT INTO users (email, uname, refresh_token)
+					event_query="""INSERT INTO users (user_id, email, uname, refresh_token)
 					VALUES (
 						%s,%s,%s
 					);"""
-					cur.execute(event_query, (email, uname, refresh_token))
+					cur.execute(event_query, (uid, email, uname, refresh_token))
 					conn.commit()
 				else:
-					print(f"it's coming here\n{refresh_token}\nended")
 					event_query="""UPDATE users set refresh_token=%s where email=%s"""
 					cur.execute(event_query, (refresh_token, email))
 					conn.commit()
