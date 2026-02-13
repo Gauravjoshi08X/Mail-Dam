@@ -1,8 +1,11 @@
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:developer';
 import 'global_function.dart' as fn;
+
+FlutterSecureStorage storage=FlutterSecureStorage();
 
 Future<void> openAuth() async {
   final uri = Uri.parse(
@@ -13,6 +16,19 @@ Future<void> openAuth() async {
     uri,
     mode: LaunchMode.externalApplication,
   );
+}
+
+Future<void> sessionManager() async {
+  final uri=Uri.parse("https://9xkmd6fc-5000.inc1.devtunnels.ms/oauth/managesession");
+  String? session=await storage.read(key: "session_id");
+  if (session.toString().length>0){
+    await http.post(uri, headers: {"authorization": "bearer $session"});
+  }
+  else{
+    final response=await http.get(uri, headers: {"content-type": "application/json"});
+    String sessionID=jsonDecode(response.body)["session_id"];
+    storage.write(key: "session_id", value: sessionID);
+  }
 }
 
 Future<void> getName(String name) async

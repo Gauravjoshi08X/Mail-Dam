@@ -25,7 +25,7 @@ class OauthConnection:
 
         self.app.add_url_rule('/auth/google', view_func=self.auth_google)
         self.app.add_url_rule('/oauth/callback', view_func=self.oauth_callback)
-        self.app.add_url_rule('/oauth/getsession', view_func=self.getSession)
+        self.app.add_url_rule('/oauth/managesession', view_func=self.sessionManager)
 
     def auth_google(self):
         self.flow = Flow.from_client_secrets_file(
@@ -65,12 +65,6 @@ class OauthConnection:
             print("Error in OAuth callback:", e)
             return f"OAuth failed: {e}", 500
     
-    def sessionRedis(self):      
-            session_id=""
-            for _ in range(8):
-                session_id+=str(uuid.uuid4())
-            session_id=session_id.replace('-', "")
-
     def sessionRedis(self):
             for _ in range(8):
                 self.session_id+=str(uuid.uuid4())
@@ -80,9 +74,16 @@ class OauthConnection:
             res=redis.from_url(self.REDIS_URL)
             res.set(name=self.session_id, value=user_id, ex=7*24*60*60)
             return (self.session_id, user_id)
+
     # Only runs ater sessionRedis is called. using async is better.
-    def getSession(self)->str:
-        return self.session_id
+    def sessionManager(self)->dict:
+        auth=request.authorization
+        if auth:
+            res: redis.Redis=redis.from_url(self.REDIS_URL)
+            uid=res.get(auth)
+            
+        else:
+            return {"session_id": self.session_id}
             
 if __name__ == "__main__":
     oauth_conn = OauthConnection()
