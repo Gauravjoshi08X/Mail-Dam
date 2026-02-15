@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+SVGContent svg = SVGContent();
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
   @override
@@ -113,7 +114,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>{
     int currentTabIndex = 0;
-    SVGContent svg = SVGContent();
 
 String? selectedImg;
 String? selectedCSV;
