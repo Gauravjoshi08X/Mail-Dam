@@ -40,11 +40,6 @@ class TrackingServer:
     def sendTracker(self, emailID) -> Response:
         self._logEvents(emailID)
         response=fk.send_file(self._getTrackerURL(), mimetype="image/png")
-        # kinda forcing agent to return these
-        response.headers["Accept-CH"] = "Sec-CH-UA, Sec-CH-UA-Platform"
-        # this restricts browser to cache tracker but may not work with gmail
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-
         return response
     
     # With Link
