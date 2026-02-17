@@ -8,8 +8,6 @@ import MailBud.utils.databaseConnect as dc
 from MailBud.utils.locateIP import trackIP
 
 class TrackingServer:
-    # Global Variables
-    # mailFolder: str=maiLanding.mailLand()
     def __init__(self, tracker: str="static/trackingPixel.png"):
         self.app = Flask(__name__) 
         self.encryptor: Encryptor=Encryptor()
