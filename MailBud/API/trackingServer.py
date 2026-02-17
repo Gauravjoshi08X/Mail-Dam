@@ -36,7 +36,6 @@ class TrackingServer:
     sendTracker
     '''
 
-    # TODO:  Fix duplicate entry
     def sendTracker(self, emailID) -> Response:
         self._logEvents(emailID)
         response=fk.send_file(self._getTrackerURL(), mimetype="image/png")
