@@ -3,6 +3,7 @@ import dotenv, os
 
 dotenv.load_dotenv("src/certs/credential.env")
 
+# TODO: Try implementing abstract class to make a template.
 class DatabaseInsert():
 	def __init__(self):
 		self.name=os.getenv("DBNAME")
