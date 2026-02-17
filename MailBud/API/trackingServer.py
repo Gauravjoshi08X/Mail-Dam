@@ -36,6 +36,7 @@ class TrackingServer:
     sendTracker
     '''
 
+    # Duplicates are ignored by db functions. can be removed using rate limiting 
     def sendTracker(self, emailID) -> Response:
         self._logEvents(emailID)
         response=fk.send_file(self._getTrackerURL(), mimetype="image/png")
