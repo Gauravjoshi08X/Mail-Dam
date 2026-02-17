@@ -28,6 +28,7 @@ class OauthConnection:
         self.app.add_url_rule('/oauth/managesession', view_func=self.sessionManager)
 
     def auth_google(self):
+        # TODO: Make this a private class variable.
         self.flow = Flow.from_client_secrets_file(
             self.CLIENT_SECRETS,
             scopes=self.SCOPES,
