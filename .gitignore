@@ -1,9 +1,6 @@
-loginLog.log
 .vscode
 src
 __pycache__
 rough.py
 Mail-Bud-Frontend
-emails.txt
-data.txt
 MailBud
