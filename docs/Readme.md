@@ -16,7 +16,7 @@
 
 ## Project Overview
 
-**Maildam** is a full-stack email and SMS marketing application that allows users to send bulk campaigns, track opens and clicks, and visualize analytics on a dashboard. The system integrates Python backend APIs with a Flutter frontend and uses Firebase Realtime Database to manage real-time tracking of user interactions.
+**Maildam** is a full-stack email and SMS marketing application that allows users to send bulk campaigns, track opens and clicks, and visualize analytics on a dashboard. The system integrates Python backend APIs with a Flutter frontend and uses Postgres database to manage tracking of user interactions.
 
 This project aims to provide an affordable, efficient, and user-friendly platform for email/SMS marketing.
 
@@ -35,9 +35,9 @@ This project aims to provide an affordable, efficient, and user-friendly platfor
 
 ## Tech Stack
 
-- **Backend:** Python Flask, Google Gmail API, Oauth2
+- **Backend:** Python Flask
 - **Frontend:** Flutter (Dart)  
 - **Database:** Postgres Database  
-- **Other:** HTML/CSS for email templates
+- **Other:** Redis, Google Gmail API, Oauth2
 
 ---
