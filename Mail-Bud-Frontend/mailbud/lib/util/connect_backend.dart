@@ -21,7 +21,7 @@ Future<void> openAuth() async {
 Future<void> sessionManager() async {
   final uri=Uri.parse("https://9xkmd6fc-5000.inc1.devtunnels.ms/oauth/managesession");
   String? session=await storage.read(key: "session_id");
-  if (session.toString().length>0){
+  if (session.toString().isNotEmpty){
     await http.post(uri, headers: {"authorization": "bearer $session"});
   }
   else{
