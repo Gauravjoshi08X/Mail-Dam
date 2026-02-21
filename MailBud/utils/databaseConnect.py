@@ -10,7 +10,7 @@ class DatabaseInsert():
 		self.user=os.getenv("DBUSER")
 		self.password=os.getenv("DBPASSWORD")
 
-	def insertUserData(self,uid, email: str, uname: str, refresh_token: str) -> None:
+	def insertUserData(self, uid: int, email: str, uname: str, refresh_token: str) -> None:
 		with psycopg2.connect(f"dbname={self.name} user={self.user} password={self.password}") as conn:
 			with conn.cursor() as cur:
 				check_query="""SELECT EXISTS(SELECT user_id from users where email=%s)"""

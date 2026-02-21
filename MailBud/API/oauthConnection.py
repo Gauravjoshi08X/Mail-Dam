@@ -36,8 +36,9 @@ class OauthConnection:
         )
         
         auth_url, _ = self.flow.authorization_url(
-            access_type="offline",
-            prompt="consent"
+            # access_type="offline",
+            prompt="consent",
+            # include_granted_scopes='true'
         )
 
         return redirect(auth_url)
@@ -57,9 +58,11 @@ class OauthConnection:
                 "https://www.googleapis.com/oauth2/v2/userinfo",
                 headers={"Authorization": f"Bearer {creds.token}"}
             ).json()
+
+            if not creds.refresh_token:
+                return "No refresh token"
             
-            DatabaseInsert().insertUserData(self.sessionRedis()[1], userinfo['email'], userinfo['name'], creds.refresh_token)
-            
+            DatabaseInsert().insertUserData(self.sessionRedis()[1], userinfo['email'], userinfo['name'], str(creds.refresh_token))
             return "OAuth completed"
         
         except Exception as e:
@@ -72,17 +75,16 @@ class OauthConnection:
             self.session_id=self.session_id.replace('-', "")
 
             user_id=int(str(int(uuid.uuid4()))[:10])
-            res=redis.from_url(self.REDIS_URL)
-            res.set(name=self.session_id, value=user_id, ex=7*24*60*60)
+            with redis.from_url(self.REDIS_URL) as res:
+                res.set(name=self.session_id, value=user_id, ex=7*24*60*60)
             return (self.session_id, user_id)
 
     # Only runs ater sessionRedis is called. using async is better.
     def sessionManager(self)->dict:
         auth=request.authorization
         if auth:
-            res: redis.Redis=redis.from_url(self.REDIS_URL)
-            uid=res.get(auth)
-            
+            with redis.from_url(self.REDIS_URL) as res:
+                uid: str=res.get(auth).decode()
         else:
             return {"session_id": self.session_id}
             
